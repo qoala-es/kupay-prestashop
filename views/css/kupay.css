@@ -1,0 +1,60 @@
+/**
+ * NOTICE OF LICENSE
+ *
+ * License: GPLv2 or later
+ * License URI: http://www.gnu.org/licenses/gpl-2.0.html
+ * Contributors: kupayco
+ * kupay.co
+ *
+ * Tags:
+ *      checkout,
+ *      1-click-checkout,
+ *      one-click-checkout,
+ *      prestashop,
+ *      kupay,
+ *      e-commerce,
+ *      store,
+ *      sales,
+ *      sell,
+ *      shop,
+ *      cart,
+ *      checkout,
+ *      payments
+ *
+ * With the purchase or the installation of the software in your application
+ * you accept the licence agreement.
+ * You must not modify, adapt or create derivative works of this source code
+ *
+ *  @author    Kupayco
+ *  @copyright 2021 Kupay.co
+ *  @license   GPLv2 or later
+ * @license-file license.txt
+ */
+
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;900&display=swap");
+
+.kupay-buy {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid;
+    text-align: center;
+    background-color: #122143;
+    color: #fff;
+    padding: 8px 0;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: "Roboto", sans-serif;
+    font-weight: 500;
+    margin: 20px auto;
+    min-width: 200px;
+}
+.kupay-buy svg {
+    width: 24px;
+    margin-right: 8px;
+}
+
+.kupay-buy-disabled {
+    background-color: #48587c !important;
+    pointer-events: none !important;
+}
