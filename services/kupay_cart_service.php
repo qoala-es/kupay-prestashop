@@ -29,16 +29,20 @@ use PrestaShopBundle\Entity\Lang;
  * you accept the licence agreement.
  * You must not modify, adapt or create derivative works of this source code
  *
- *  @author    Kupayco
- *  @copyright 2021 Kupay.co
- *  @license   GPLv2 or later
+ * @author    Kupayco
+ * @copyright 2021 Kupay.co
+ * @license   GPLv2 or later
  * @license-file license.txt
  */
-
 class KupayCartService
 {
 
-    public static function create(Customer $customer, $payload){
+    /**
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     */
+    public static function create(Customer $customer, $payload): array
+    {
 
         // $shops = Shop::getShops();
 
@@ -51,7 +55,7 @@ class KupayCartService
         $cart->id_currency = $currency_id;
         $cart->id_address_delivery = self::getCustomerDeliveryAddress($customer);
         $cart->id_address_invoice = self::getCustomerDeliveryAddress($customer);
-        
+
         $cart->id_shop = 1;
         $cart->add();
 
@@ -62,51 +66,51 @@ class KupayCartService
 
     }
 
-    public static function update(Customer $customer, $payload){
+    /**
+     * @throws PrestaShopException
+     */
+    public static function update(Customer $customer, $payload): array
+    {
 
         $lang_id = Language::getIdByIso($payload['shopper']['lang']);
-        
+
         $cart = new Cart($payload['code']);
 
-        // self::removeProducts($cart);
-        self::addProducts($cart, $payload);
         self::addCoupons($cart, $payload, $lang_id);
+        self::updateShippingMethod($cart, $payload);
 
-        return self::buildCartData($cart, $payload);
+        return self::updateCartData($cart, $payload);
 
     }
 
-    // public static function removeProducts(Cart $cart){
-    //     $products = $cart->getProducts();
+    /**
+     * @throws PrestaShopException
+     */
+    public static function updateShippingMethod(Cart $cart, $payload): void
+    {
+        foreach ($payload['shippingMethods'] as $shippingMethod){
+            if($shippingMethod['isSelected']){
+                $cart->setDeliveryOption([$cart->id_address_delivery => (int)$shippingMethod['code'] . ',']);
+                $cart->save();
+            }
+        }
+    }
 
-    //     foreach($products as $product){
+    public static function getCustomerDeliveryAddress(Customer $customer)
+    {
 
-    //         if($product['id_product_attribute'] > 0){
-
-    //             $cart->updateQty(0, $product['id_product'], $product['id_product_attribute']);
-
-    //         }else{
-
-    //             $cart->updateQty(0, $product['id_product']);
-
-    //         }
-
-    //     }
-    // }
-
-    public static function getCustomerDeliveryAddress(Customer $customer){
-        
         $addresses = $customer->getAddresses($customer->id_lang);
         return $addresses[0]["id_address"];
     }
 
-    public static function addProducts(Cart $cart, $payload){
-        
-        foreach($payload['items'] as $item){
+    public static function addProducts(Cart $cart, $payload): void
+    {
 
-            if(!empty($item['variantId'])){
+        foreach ($payload['items'] as $item) {
+
+            if (!empty($item['variantId'])) {
                 $cart->updateQty($item['quantity'], $item['code'], $item['variantId']);
-            }else{
+            } else {
                 $cart->updateQty($item['quantity'], $item['code']);
             }
 
@@ -114,21 +118,49 @@ class KupayCartService
 
     }
 
-    public static function addCoupons(Cart $cart, $payload, $lang_id){
+    public static function addCoupons(Cart $cart, $payload, $lang_id): void
+    {
 
-        foreach($payload['coupons'] as $coupon){
+        foreach ($payload['coupons'] as $coupon) {
             $cartRule = CartRule::getCartsRuleByCode($coupon['code'], $lang_id);
-            $cart->addCartRule($cartRule);
+            $cart->addCartRule((int)$cartRule);
         }
 
     }
 
-    private static function buildCartData(Cart $cart, $payload){
+    /**
+     * @throws PrestaShopDatabaseException
+     * @throws PrestaShopException
+     * @throws Exception
+     */
+    private static function updateCartData(Cart $cart, $payload): array
+    {
+
+        return [
+            'code' => (string) $cart->id,
+            'origin' => $payload['origin'],
+            'shopper' => $payload['shopper'],
+            'items' => self::getCartProducts($cart),
+            'shippingMethods' => $payload['shippingMethods'],
+            'coupons' => self::getCartCoupons($cart),
+            'totals' => self::getCartTotals($cart)
+        ];
+
+
+    }
+
+    /**
+     * @throws PrestaShopException
+     * @throws PrestaShopDatabaseException
+     * @throws Exception
+     */
+    private static function buildCartData(Cart $cart, $payload): array
+    {
 
         $country = new Country(Country::getByIso($payload['shopper']['shippingAddress']['countryCode']));
 
         return [
-            'code' => $cart->id,
+            'code' => (string) $cart->id,
             'origin' => $payload['origin'],
             'shopper' => $payload['shopper'],
             'items' => self::getCartProducts($cart),
@@ -136,13 +168,14 @@ class KupayCartService
             'coupons' => self::getCartCoupons($cart),
             'totals' => self::getCartTotals($cart)
         ];
-        
+
     }
 
     /*
     * Todo: to work selected carrier
     */
-    private static function getCartShippingMethods(Cart $cart, Country $country): array {
+    private static function getCartShippingMethods(Cart $cart, Country $country): array
+    {
 
         $deliveryOptionsList = $cart->getDeliveryOptionList($country);
 
@@ -155,41 +188,41 @@ class KupayCartService
                 $carrierList = $option['carrier_list'];
 
                 foreach ($carrierList as $key => $carrier) {
-                    
+
                     $deliveryOptions[] = [
                         'name' => $carrier['instance']->name,
                         'code' => $key,
-                        // 'description' => "",
                         'subtotal' => number_format($carrier['price_without_tax'], 2),
-                        'tax' => number_format((float)$carrier['price_with_tax'] - (float)$carrier['price_without_tax'], 2) ,
+                        'tax' => number_format((float)$carrier['price_with_tax'] - (float)$carrier['price_without_tax'], 2),
                         'total' => number_format((float)$carrier['price_with_tax'], 2),
                         'isSelected' => $cart->id_carrier == $carrier['instance']->id_reference
                     ];
-                    
+
                 }
 
             }
 
         }
 
-        $deliveryOptions[0]['isSelected'] = true; // toDo it dinm 
+        $deliveryOptions[0]['isSelected'] = true;
 
         return $deliveryOptions;
     }
 
-    private static function getCartProducts(Cart $cart){
+    private static function getCartProducts(Cart $cart): array
+    {
 
         $items = [];
 
-        foreach($cart->getProducts() as $product){
+        foreach ($cart->getProducts() as $product) {
 
             $items[] = [
 
-                'code' => $product['id_product'],
-                'quantity' => $product['cart_quantity'],
+                'code' => (string) $product['id_product'],
+                'quantity' => (int) $product['cart_quantity'],
                 'variantId' => $product['id_product_attribute'],
                 'name' => $product['name'],
-                'price' => number_format($product['price'], 2),
+                'price' => (float) number_format($product['price'], 2),
                 'imageUrl' => "https://user-images.githubusercontent.com/101482/29592647-40da86ca-875a-11e7-8bc3-941700b0a323.png"
 
             ];
@@ -200,28 +233,31 @@ class KupayCartService
 
     }
 
-    public static function calculateCartShipping(Cart $cart) : float{
+    public static function calculateCartShipping(Cart $cart): float
+    {
 
         return $cart->getTotalShippingCost();
-        
+
     }
 
-    public static function calculateProductsTotal(Cart $cart): float{
+    public static function calculateProductsTotal(Cart $cart): float
+    {
 
         $total = 0.0;
 
-        foreach($cart->getProducts() as $product){
-            $total += (float) $product['price'];
+        foreach ($cart->getProducts() as $product) {
+            $total += (float)$product['price'];
         }
 
         return $total;
 
     }
 
-    public static function getCartCoupons(Cart $cart){
+    public static function getCartCoupons(Cart $cart): array
+    {
         $coupons = [];
 
-        foreach($cart->getCartRules() as $rule){
+        foreach ($cart->getCartRules() as $rule) {
             $coupons[] = [
                 'code' => $rule['code'],
                 'value' => $rule['value_real']
@@ -232,7 +268,11 @@ class KupayCartService
 
     }
 
-    public static function getCartTotals(Cart $cart){
+    /**
+     * @throws Exception
+     */
+    public static function getCartTotals(Cart $cart): array
+    {
 
         $cartAmountTaxIncluded = $cart->getOrderTotal(true, Cart::ONLY_PRODUCTS);
         $cartAmountTaxExcluded = $cart->getOrderTotal(false, Cart::ONLY_PRODUCTS);

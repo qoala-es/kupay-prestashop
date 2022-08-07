@@ -42,6 +42,9 @@ require_once dirname(__FILE__) . '../../../services/kupay_user_service.php';
 
 class KupayCartModuleFrontController extends ModuleFrontController
 {
+    /**
+     * @throws PrestaShopException
+     */
     public function run()
     {
         header('Content-Type: ' . "application/json");
