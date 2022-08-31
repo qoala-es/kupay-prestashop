@@ -41,21 +41,21 @@ class KupayOrderService
     public static function create($payload)
     {
 
-        $paymentMethods = PaymentModuleCore ::getInstalledPaymentModules();
+        $paymentMethods = PaymentModuleCore::getInstalledPaymentModules();
         $paymentModule = Module::getInstanceByName($paymentMethods[0]['name']);
-        $paymentName = $paymentModule -> name;
-        
+        $paymentName = $paymentModule->name;
+
         $cart = new Cart($payload['cartId']);
-        
+
         $order = new Order();
         $order->id_customer = $cart->id_customer;
         $order->id_address_delivery = $cart->id_address_delivery;
         $order->id_address_invoice = $cart->id_address_delivery;
         $order->id_cart = $cart->id;
         $order->id_currency = (int)  $cart->id_currency;
-        $order->id_carrier = 2;
+        $order->id_carrier = $cart->id_carrier;
         $order->id_lang = (int) $cart->id_lang;
-        $order->payment = $paymentMethods[0]['name'];
+        $order->payment = "Kupay";
         $order->module = $paymentName;
         $order->total_paid = (float) $cart->getOrderTotal();
         $order->total_paid_real = (float) $cart->getOrderTotal();
@@ -69,41 +69,44 @@ class KupayOrderService
         $order->total_shipping = (float) number_format($cart->getTotalShippingCost(), 2);
         $order->total_discounts = (float) number_format($cart->getDiscountSubtotalWithoutGifts(true), 2);
         $order->total_shipping_tax_incl = (float) number_format($cart->getTotalShippingCost(), 2);
-        $order->total_shipping_tax_excl = (float) number_format($cart->getTotalShippingCost(),2);
+        $order->total_shipping_tax_excl = (float) number_format($cart->getTotalShippingCost(), 2);
         $order->id_shop = $cart->id_shop;
         $order->conversion_rate = 1;
         $order->secure_key = $cart->secure_key;
         $order->note = "Placed via Kupay 1-Click Checkout";
-        $order->reference = Order ::generateReference();
-        $order->current_state = Configuration ::get('PS_OS_OUTOFSTOCK_UNPAID');
-        $order -> date_add = date('Y-m-d H:i:s');
-        $order -> date_upd = date('Y-m-d H:i:s');
+        $order->reference = Order::generateReference();
+        $order->current_state = Configuration::get('PS_OS_OUTOFSTOCK_UNPAID');
+        $order->date_add = date('Y-m-d H:i:s');
+        $order->date_upd = date('Y-m-d H:i:s');
         $order->current_state = 3;
-        
+
         $order->add();
+
+
 
         self::addProducts($order, $cart);
 
         return self::buildOrderData($order);
-
     }
 
-    public static function addCoupons(Order $order, Cart $cart){
+    public static function addCoupons(Order $order, Cart $cart)
+    {
         // foreach($cart->getCartRules() as $cartRules){
         //     $order->addCartRule()
         // }
     }
 
-    public static function addProducts(Order $order, Cart $cart){
+    public static function addProducts(Order $order, Cart $cart)
+    {
 
-        foreach($cart->getPackageList() as $packageInnerList){
+        foreach ($cart->getPackageList() as $packageInnerList) {
 
-            foreach($packageInnerList as $package){
+            foreach ($packageInnerList as $package) {
 
-                foreach($package['product_list'] as $product){
+                foreach ($package['product_list'] as $product) {
 
                     $orderDetail = new OrderDetail();
-    
+
                     $orderDetail->product_id = $product['id_product'];
                     $orderDetail->product_name = $product['name'];
                     $orderDetail->product_attribute_id = $product['id_product_attribute'];
@@ -113,18 +116,23 @@ class KupayOrderService
                     $orderDetail->product_price = $product['price'];
                     $orderDetail->product_quantity = $product['cart_quantity'];
                     $orderDetail->id_shop = $cart->id_shop;
-    
+
                     $orderDetail->add();
-    
+
+                    $order_carrier = new OrderCarrier();
+                    $order_carrier->id_order = (int)$order->id;
+                    $order_carrier->id_carrier = (int)$cart->id_carrier;
+                    $order_carrier->weight = (float)$order->getTotalWeight();
+                    $order_carrier->shipping_cost_tax_excl = (float)$order->total_shipping_tax_excl;
+                    $order_carrier->shipping_cost_tax_incl = (float)$order->total_shipping_tax_incl;
+                    $order_carrier->add();
                 }
-
             }
-            
         }
-
     }
 
-    public static function buildOrderData(Order $order){
+    public static function buildOrderData(Order $order)
+    {
 
         return [
             'code' => $order->reference,
@@ -134,7 +142,5 @@ class KupayOrderService
             'shippingMethods' => [],
             'totals' => []
         ];
-
     }
-
 }
