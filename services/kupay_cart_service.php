@@ -63,7 +63,6 @@ class KupayCartService
         self::addCoupons($cart, $payload, $lang_id);
 
         return self::buildCartData($cart, $payload);
-
     }
 
     /**
@@ -80,7 +79,6 @@ class KupayCartService
         self::updateShippingMethod($cart, $payload);
 
         return self::updateCartData($cart, $payload);
-
     }
 
     /**
@@ -88,8 +86,8 @@ class KupayCartService
      */
     public static function updateShippingMethod(Cart $cart, $payload): void
     {
-        foreach ($payload['shippingMethods'] as $shippingMethod){
-            if($shippingMethod['isSelected']){
+        foreach ($payload['shippingMethods'] as $shippingMethod) {
+            if ($shippingMethod['isSelected']) {
                 $cart->setDeliveryOption([$cart->id_address_delivery => (int)$shippingMethod['code'] . ',']);
                 $cart->save();
             }
@@ -113,9 +111,7 @@ class KupayCartService
             } else {
                 $cart->updateQty($item['quantity'], $item['code']);
             }
-
         }
-
     }
 
     public static function addCoupons(Cart $cart, $payload, $lang_id): void
@@ -125,7 +121,6 @@ class KupayCartService
             $cartRule = CartRule::getCartsRuleByCode($coupon['code'], $lang_id);
             $cart->addCartRule((int)$cartRule);
         }
-
     }
 
     /**
@@ -145,8 +140,6 @@ class KupayCartService
             'coupons' => self::getCartCoupons($cart),
             'totals' => self::getCartTotals($cart)
         ];
-
-
     }
 
     /**
@@ -168,7 +161,6 @@ class KupayCartService
             'coupons' => self::getCartCoupons($cart),
             'totals' => self::getCartTotals($cart)
         ];
-
     }
 
     /*
@@ -197,11 +189,8 @@ class KupayCartService
                         'total' => number_format((float)$carrier['price_with_tax'], 2),
                         'isSelected' => $cart->id_carrier == $carrier['instance']->id_reference
                     ];
-
                 }
-
             }
-
         }
 
         $deliveryOptions[0]['isSelected'] = true;
@@ -226,18 +215,15 @@ class KupayCartService
                 'imageUrl' => "https://user-images.githubusercontent.com/101482/29592647-40da86ca-875a-11e7-8bc3-941700b0a323.png"
 
             ];
-
         }
 
         return $items;
-
     }
 
     public static function calculateCartShipping(Cart $cart): float
     {
 
         return $cart->getTotalShippingCost();
-
     }
 
     public static function calculateProductsTotal(Cart $cart): float
@@ -250,7 +236,6 @@ class KupayCartService
         }
 
         return $total;
-
     }
 
     public static function getCartCoupons(Cart $cart): array
@@ -265,7 +250,6 @@ class KupayCartService
         }
 
         return $coupons;
-
     }
 
     /**
@@ -282,9 +266,7 @@ class KupayCartService
             'shipping' => number_format(self::calculateCartShipping($cart), 2),
             'subtotal' => number_format(self::calculateProductsTotal($cart), 2),
             'discounts' => number_format($cart->getDiscountSubtotalWithoutGifts(true), 2),
-            'total' => number_format($cart->getOrderTotal(false, Cart::BOTH), 2),
+            'total' => number_format($cart->getOrderTotal(true, Cart::BOTH), 2),
         ];
     }
-
-
 }
