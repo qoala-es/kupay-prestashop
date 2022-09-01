@@ -39,8 +39,8 @@
     align-items: center;
     border: 1px solid;
     text-align: center;
-    background-color: #122143;
-    color: #fff;
+    background-color: #FFF;
+    color: #122143;
     padding: 8px 0;
     border-radius: 6px;
     cursor: pointer;
@@ -49,8 +49,9 @@
     margin: 20px auto;
     min-width: 200px;
 }
+
 .kupay-buy svg {
-    width: 24px;
+    width: 18px;
     margin-right: 8px;
 }
 
