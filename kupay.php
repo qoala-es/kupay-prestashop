@@ -381,6 +381,7 @@ class Kupay extends Module
 
         $this->context->controller->addCSS($assetsUrl . 'css/kupay.css');
         $this->context->controller->addJS($assetsUrl . 'js/kupay.js');
+        $this->context->controller->addJS($assetsUrl . 'js/kupay-quickview.js');
 
         if ($this->context->controller->getPageName() === 'product') {
 
@@ -411,6 +412,8 @@ class Kupay extends Module
             if ($this->context->controller->getPageName() === 'product' && $this->isEnableForProduct($this->context->controller->getProduct()->id)) {
                 $this->context->controller->addJS($assetsUrl . 'js/kupay-pdp.js');
                 // $this->context->controller->registerJavascript()
+
+
             }
         }
 

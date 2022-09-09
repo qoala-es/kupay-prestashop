@@ -131,3 +131,37 @@ function kupayCartCheckout() {
 
     kupayRedirectToCheckoutWindow(iframeUrl);
 }
+
+function setIdProductAttribute(attribute) {
+    kupay.idProductAttribute = attribute;
+}
+
+function setIdProduct(id) {
+    kupay.idProduct = id;
+}
+
+async function kupayPdpQuickviewCheckout() {
+    console.log('prestashop', prestashop);
+    console.log(kupay);
+
+    const quantity = document.getElementById('quantity_wanted').value;
+    let price = document.getElementsByClassName('current-price-value')[0];
+    price = parseFloat(price.innerHTML.trim().substring(1));
+
+    let iframeUrl = kupay.iframeUrl;
+
+    iframeUrl += "?appId=" + kupay.appId;
+    iframeUrl += "&productId=" + kupay.idProduct;
+    iframeUrl += "&productName=" + "NOMBRE";
+    iframeUrl += "&productPrice=" + price;
+    iframeUrl += "&productQuantity=" + quantity;
+    iframeUrl += "&productImageUrl=" + '';
+    iframeUrl += "&requiresProcessing=" + '1';
+    iframeUrl += "&origin=" + 'Quickview';
+    iframeUrl += "&currency=" + prestashop.currency.iso_code;
+    iframeUrl += "&deliveryCost=" + '0';
+    iframeUrl += "&variantId=" + kupay.idProductAttribute;
+    iframeUrl += "&prestashop=" + true;
+
+    kupayRedirectToCheckoutWindow(iframeUrl);
+}
