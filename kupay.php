@@ -381,7 +381,12 @@ class Kupay extends Module
 
         $this->context->controller->addCSS($assetsUrl . 'css/kupay.css');
         $this->context->controller->addJS($assetsUrl . 'js/kupay.js');
-        $this->context->controller->addJS($assetsUrl . 'js/kupay-quickview.js');
+        
+        // If we are not in a Product Page, add the quickview JS
+        if ($this->context->controller->getPageName() !== 'product') {
+            
+            $this->context->controller->addJS($assetsUrl . 'js/kupay-quickview.js');
+        }
 
         if ($this->context->controller->getPageName() === 'product') {
 

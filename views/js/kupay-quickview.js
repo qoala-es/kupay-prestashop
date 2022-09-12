@@ -37,10 +37,7 @@ prestashop.on('clickQuickView', function(res) {
     
     mutationObserver.observe(parent, { childList: true });
 
+    // Get the ID of the Product in the quickview
     const idProduct = res.dataset.idProduct;
     setIdProduct(idProduct);
-    const idProductAttribute = res.dataset.idProductAttribute;
-    setIdProductAttribute(idProductAttribute);
-    console.log(idProduct);
-    console.log(idProductAttribute);
 });
