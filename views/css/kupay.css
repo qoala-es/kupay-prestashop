@@ -33,8 +33,8 @@
 
 @font-face {
     font-family: 'Euclid Circular B';
-    src:  url('euclid_circular_b_regular.ttf') format('truetype'),
-    url('euclid_circular_b_regular.ttf') format('truetype');
+    src:  url('../fonts/euclid_circular_b_regular.ttf') format('truetype'),
+    url('../fonts/euclid_circular_b_regular.ttf') format('truetype');
 }
 
 .kupay-buy {
