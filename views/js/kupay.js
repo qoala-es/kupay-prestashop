@@ -131,3 +131,69 @@ function kupayCartCheckout() {
 
     kupayRedirectToCheckoutWindow(iframeUrl);
 }
+
+// Setter functions for Product parameters on the Quickview Modal
+function setIdProductAttribute(attribute) {
+    kupay.idProductAttribute = attribute;
+}
+
+function setIdProduct(id) {
+    kupay.idProduct = id;
+}
+
+function setProductName(productName) {
+    kupay.productName = productName;
+}
+
+// Quickview Modal Checkout
+async function kupayPdpQuickviewCheckout() {
+    console.log('prestashop', prestashop);
+
+    const quantity = document.getElementById('quantity_wanted').value;
+
+    // Get Product price
+    let price = document.getElementsByClassName('current-price-value')[0];
+    price = parseFloat(price.innerHTML.trim().substring(1));
+
+    let iframeUrl = kupay.iframeUrl;
+
+    iframeUrl += "?appId=" + kupay.appId;
+    iframeUrl += "&productId=" + kupay.idProduct;
+    iframeUrl += "&productName=" + kupay.productName;
+    iframeUrl += "&productPrice=" + price;
+    iframeUrl += "&productQuantity=" + quantity;
+    iframeUrl += "&productImageUrl=" + '';
+    iframeUrl += "&requiresProcessing=" + '1';
+    iframeUrl += "&origin=" + 'PDP';
+    iframeUrl += "&currency=" + prestashop.currency.iso_code;
+    iframeUrl += "&deliveryCost=" + '0';
+    iframeUrl += "&variantId=" + kupay.idProductAttribute;
+    iframeUrl += "&prestashop=" + true;
+
+    kupayRedirectToCheckoutWindow(iframeUrl);
+}
+
+// Check for completed AJAX Requests
+$(document).ajaxComplete(function(event, xhr, settings) {
+    controllerUrl = "index.php?controller=product";
+
+    // Check if it's coming from the Product Controller
+    if (settings.url.includes(controllerUrl)) {
+
+        let resp = JSON.parse(xhr.responseText);
+        // Checks if the Quickview Modal is opened for the first time
+        if (resp['quickview_html'] && settings.type == "POST") {
+            var idProductAttribute = resp['product']['cache_default_attribute'];
+            var productName = resp['product']['name'];
+        }
+        // Checks if the variation inside the modal has changed
+        if (resp['is_quick_view'] && settings.type == "POST") {
+            var idProductAttribute = resp['id_product_attribute'];
+            var productName = resp['product_title'];
+        }
+
+        // Set Product Name and Product Attribute id
+        setProductName(productName);
+        setIdProductAttribute(idProductAttribute);
+    }
+});

@@ -411,6 +411,12 @@ class Kupay extends Module
             if ($this->context->controller->getPageName() === 'product' && $this->isEnableForProduct($this->context->controller->getProduct()->id)) {
                 $this->context->controller->addJS($assetsUrl . 'js/kupay-pdp.js');
                 // $this->context->controller->registerJavascript()
+
+            }
+
+            // If we are not in a Product Page, add the quickview JS
+            if ($this->context->controller->getPageName() !== 'product') {
+                $this->context->controller->addJS($assetsUrl . 'js/kupay-quickview.js');
             }
         }
 
