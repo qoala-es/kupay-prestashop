@@ -31,7 +31,11 @@
  * @license-file license.txt
  */
 
-@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;900&display=swap");
+@font-face {
+    font-family: 'Euclid Circular B';
+    src:  url('euclid_circular_b_regular.ttf') format('truetype'),
+    url('euclid_circular_b_regular.ttf') format('truetype');
+}
 
 .kupay-buy {
     display: flex;
@@ -39,19 +43,20 @@
     align-items: center;
     border: 1px solid;
     text-align: center;
-    background-color: #122143;
+    background-color: #FB8500;
     color: #FFF;
     padding: 8px 0;
     border-radius: 6px;
     cursor: pointer;
-    font-family: "Roboto", sans-serif;
-    font-weight: 500;
+    font-family: "Euclid Circular B", serif;
+    font-size: 18px;
+    font-weight: 700;
     margin: 20px auto;
     min-width: 200px;
 }
 
 .kupay-buy svg {
-    width: 18px;
+    width: 32px;
     margin-right: 8px;
 }
 
