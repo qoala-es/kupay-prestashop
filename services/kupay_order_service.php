@@ -108,7 +108,10 @@ class KupayOrderService
                     $orderDetail = new OrderDetail();
 
                     $orderDetail->product_id = $product['id_product'];
-                    $orderDetail->product_name = $product['name'];
+                    // If there are attributes, we set them in the product name
+                    $orderDetail->product_name = $product['name'] .
+                    ((isset($product['attributes']) && $product['attributes'] != null) ?
+                    ' (' . $product['attributes'] . ') ' . '[ID: ' . $product['id_product_attribute'] . ']' : '');
                     $orderDetail->product_attribute_id = $product['id_product_attribute'];
                     $orderDetail->id_order = $order->id;
                     $orderDetail->id_warehouse = $package['id_warehouse'];
