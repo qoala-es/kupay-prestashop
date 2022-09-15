@@ -86,6 +86,8 @@ class KupayOrderService
 
         self::addProducts($order, $cart);
 
+        self::createOrderPaymentTransaction($order);
+
         return self::buildOrderData($order);
     }
 
@@ -145,5 +147,25 @@ class KupayOrderService
             'shippingMethods' => [],
             'totals' => []
         ];
+    }
+
+    // Add an OrderPayment entry related to the Order generated
+    public static function createOrderPaymentTransaction(Order $order)
+    {
+        $orderPayment = new OrderPayment();
+
+        $orderPayment->order_reference = $order->reference;
+        $orderPayment->id_currency = $order->id_currency;
+        $orderPayment->amount = $order->total_paid;
+        $orderPayment->payment_method = 'Qoala Checkout';
+        $orderPayment->conversion_rate = 1.00;
+        $orderPayment->transaction_id = 0;
+        $orderPayment->card_number = 0;
+        $orderPayment->card_brand = 0;
+        $orderPayment->card_expiration = 0;
+        $orderPayment->card_holder = 0;
+        $orderPayment->date_add = date('Y-m-d H:i:s');
+
+        $orderPayment->add();
     }
 }
