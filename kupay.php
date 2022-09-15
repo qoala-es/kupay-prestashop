@@ -39,8 +39,8 @@ class Kupay extends Module
     {
         $this->name = 'kupay';
         $this->tab = 'front_office_features';
-        $this->version = '1.0.6';
-        $this->author = 'Kupay';
+        $this->version = '1.0.7';
+        $this->author = 'Qoala';
         $this->need_instance = 0;
 
         /**
@@ -59,8 +59,8 @@ class Kupay extends Module
 
         parent::__construct();
 
-        $this->displayName = $this->l('Kupay');
-        $this->description = $this->l('Kupay 1-Click Checkout');
+        $this->displayName = $this->l('Qoala');
+        $this->description = $this->l('Qoala Checkout');
 
         $this->confirmUninstall = $this->l('Are you sure you want to uninstall?');
 
