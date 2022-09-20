@@ -220,7 +220,9 @@ class KupayCartService
                 'code' => (string) $product['id_product'],
                 'quantity' => (int) $product['cart_quantity'],
                 'variantId' => (string) $product['id_product_attribute'],
-                'name' => $product['name'],
+                'name' => $product['name'] .
+                ((isset($product['attributes']) && $product['attributes'] != null) ?
+                ' (' . $product['attributes'] . ') ' : ''),
                 'price' => (float) number_format($product['price'], 2),
                 // 'imageUrl' => self::getProductImage($product['id_product']),
                 'imageUrl' => self::getProductAttributeImage($product['id_product'], $product['id_product_attribute'])
