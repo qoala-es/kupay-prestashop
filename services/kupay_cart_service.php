@@ -220,14 +220,44 @@ class KupayCartService
                 'code' => (string) $product['id_product'],
                 'quantity' => (int) $product['cart_quantity'],
                 'variantId' => (string) $product['id_product_attribute'],
-                'name' => $product['name'],
+                'name' => $product['name'] .
+                ((isset($product['attributes']) && $product['attributes'] != null) ?
+                ' (' . $product['attributes'] . ') ' : ''),
                 'price' => (float) number_format($product['price'], 2),
-                'imageUrl' => self::getProductImage($product['id_product'])
+                // 'imageUrl' => self::getProductImage($product['id_product']),
+                'imageUrl' => self::getProductAttributeImage($product['id_product'], $product['id_product_attribute'])
 
             ];
         }
 
         return $items;
+    }
+
+    // Retrieve the image url based on the product attribute
+    private static function getProductAttributeImage($id_product, $id_product_attribute)
+    {
+        try {
+
+            $product = new Product((int)$id_product);
+
+            if ($id_product_attribute != 0) {
+
+                $image = $product->_getAttributeImageAssociations($id_product_attribute);
+                $image_name = $product->link_rewrite[count($product->link_rewrite) - 1];
+                $image_link = Context::getContext()->link->getImageLink($image_name, (int)$image[0], "medium_default");
+
+            } else {
+                $image = $product->getCover($product->id);
+                $image_name = $product->link_rewrite[count($product->link_rewrite) - 1];
+                $image_link = Context::getContext()->link->getImageLink($image_name, (int)$image['id_image'], "medium_default");
+            }
+
+            return $image_link;
+
+        } catch (Exception $e) {
+
+            return "https://user-images.githubusercontent.com/101482/29592647-40da86ca-875a-11e7-8bc3-941700b0a323.png";
+        }
     }
 
     private static function getProductImage($id_product)
