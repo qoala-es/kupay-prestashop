@@ -167,26 +167,26 @@ class Kupay extends Module
                             )
                         )
                     ],
-                    // [
-                    //     'type' => 'switch',
-                    //     'label' => $this->l('Enable checkout button on Cart Page'),
-                    //     'name' => 'KUPAYMODULE_CART',
-                    //     'size' => 20,
-                    //     'required' => true,
-                    //     'is_bool' => true,
-                    //     'values' => array(
-                    //         array(
-                    //             'id' => 'ON',
-                    //             'value' => true,
-                    //             'label' => $this->l('Enabled')
-                    //         ),
-                    //         array(
-                    //             'id' => 'OFF',
-                    //             'value' => false,
-                    //             'label' => $this->l('Disabled')
-                    //         )
-                    //     )
-                    // ],
+                    [
+                        'type' => 'switch',
+                        'label' => $this->l('Enable checkout button on Cart Page'),
+                        'name' => 'KUPAYMODULE_CART',
+                        'size' => 20,
+                        'required' => true,
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'ON',
+                                'value' => true,
+                                'label' => $this->l('Enabled')
+                            ),
+                            array(
+                                'id' => 'OFF',
+                                'value' => false,
+                                'label' => $this->l('Disabled')
+                            )
+                        )
+                    ],
                     // [
                     //     'type' => 'switch',
                     //     'label' => $this->l('Enable checkout button on Checkout Page'),
@@ -375,7 +375,6 @@ class Kupay extends Module
         // $context->controller = new FrontController();
 
         // var_dump($context->controller->getProduct());
-
 
         $assetsUrl = $this->_path . 'views/';
 
