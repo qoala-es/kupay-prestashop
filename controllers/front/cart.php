@@ -50,6 +50,9 @@ class KupayCartModuleFrontController extends ModuleFrontController
         header('Content-Type: ' . "application/json");
         parent::init();
         switch ($_SERVER['REQUEST_METHOD']) {
+            case 'GET':
+                $this->processGetRequest();
+                break;
             case 'POST':
                 $this->processPostRequest();
                 break;
@@ -59,6 +62,32 @@ class KupayCartModuleFrontController extends ModuleFrontController
             default:
                 $this->processNotSupportedRequest();
         }
+    }
+
+    protected function processGetRequest() {
+
+        try {
+
+            $payload = json_decode(Tools::file_get_contents('php://input'), true);
+
+            $customer = KupayUserService::create($payload['shopper']);
+
+            $cart = KupayCartService::update($customer, $payload);
+
+            $this->ajaxRender(json_encode($cart));
+
+            
+        } catch (Exception $e) {
+            
+            http_response_code(500);
+
+            $this->ajaxRender(json_encode([
+                'message' => $e->getMessage(),
+                'trace' => json_encode($e->getTrace())
+            ]));
+            
+        }
+
     }
 
     protected function processPostRequest() {
