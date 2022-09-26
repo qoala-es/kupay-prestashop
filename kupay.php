@@ -187,26 +187,26 @@ class Kupay extends Module
                     //         )
                     //     )
                     // ],
-                    // [
-                    //     'type' => 'switch',
-                    //     'label' => $this->l('Enable checkout button on Checkout Page'),
-                    //     'name' => 'KUPAYMODULE_CHECKOUT',
-                    //     'size' => 20,
-                    //     'required' => true,
-                    //     'is_bool' => true,
-                    //     'values' => array(
-                    //         array(
-                    //             'id' => 'ON',
-                    //             'value' => true,
-                    //             'label' => $this->l('Enabled')
-                    //         ),
-                    //         array(
-                    //             'id' => 'OFF',
-                    //             'value' => false,
-                    //             'label' => $this->l('Disabled')
-                    //         )
-                    //     )
-                    // ],
+                    [
+                        'type' => 'switch',
+                        'label' => $this->l('Enable checkout button on Checkout Page'),
+                        'name' => 'KUPAYMODULE_CHECKOUT',
+                        'size' => 20,
+                        'required' => true,
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'ON',
+                                'value' => true,
+                                'label' => $this->l('Enabled')
+                            ),
+                            array(
+                                'id' => 'OFF',
+                                'value' => false,
+                                'label' => $this->l('Disabled')
+                            )
+                        )
+                    ],
                     [
                         'type' => 'textarea',
                         'label' => $this->l('Enable Kupay Exclusively For These Products (Separate ids by comma)'),
