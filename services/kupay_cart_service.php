@@ -233,46 +233,35 @@ class KupayCartService
         return $items;
     }
 
-    // Retrieve the image url based on the product attribute
+    // Retrieve the image url of the product
     private static function getProductAttributeImage($id_product, $id_product_attribute)
     {
         try {
-
+            $get_cover = false;
             $product = new Product((int)$id_product);
 
-            if ($id_product_attribute != 0) {
-
-                $image = $product->_getAttributeImageAssociations($id_product_attribute);
-                $image_name = $product->link_rewrite[count($product->link_rewrite) - 1];
-                $image_link = Context::getContext()->link->getImageLink($image_name, (int)$image[0], "medium_default");
-
-            } else {
-                $image = $product->getCover($product->id);
-                $image_name = $product->link_rewrite[count($product->link_rewrite) - 1];
-                $image_link = Context::getContext()->link->getImageLink($image_name, (int)$image['id_image'], "medium_default");
+            // If there is no variant ID, go for the product's cover image
+            if ($id_product_attribute == 0) {
+                $get_cover = true;
             }
 
-            return $image_link;
-
-        } catch (Exception $e) {
-
-            return "https://user-images.githubusercontent.com/101482/29592647-40da86ca-875a-11e7-8bc3-941700b0a323.png";
-        }
-    }
-
-    private static function getProductImage($id_product)
-    {
-
-        try {
-
-            $product = new Product((int)$id_product);
-
-            $img = $product->getCover($product->id);
-
+            // Set image name
             $image_name = $product->link_rewrite[count($product->link_rewrite) - 1];
+            // Get id_image from the id_product_attribute
+            $image_attribute = $product->_getAttributeImageAssociations($id_product_attribute);
 
+            // If the product does not have a image related to the attribute selected, go for the cover image
+            if (count($image_attribute) > 0) {
+                return Context::getContext()->link->getImageLink($image_name, (int)$image_attribute[0], "medium_default");
+            } else {
+                $get_cover = true;
+            }
 
-            return  Context::getContext()->link->getImageLink($image_name, (int)$img['id_image'], "medium_default");
+            if ($get_cover) {
+                $image = $product->getCover($product->id);
+                return Context::getContext()->link->getImageLink($image_name, (int)$image['id_image'], "medium_default");
+            }
+
         } catch (Exception $e) {
 
             return "https://user-images.githubusercontent.com/101482/29592647-40da86ca-875a-11e7-8bc3-941700b0a323.png";
