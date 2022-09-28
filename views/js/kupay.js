@@ -114,7 +114,7 @@ async function kupayPdpCheckout() {
     kupayRedirectToCheckoutWindow(iframeUrl);
 }
 
-function kupayCartCheckout() {
+async function kupayCartCheckout() {
 
     console.log('prestashop', prestashop);
 
@@ -176,6 +176,7 @@ async function kupayPdpQuickviewCheckout() {
 // Check for completed AJAX Requests
 $(document).ajaxComplete(function(event, xhr, settings) {
     controllerUrl = "index.php?controller=product";
+    cartRefreshUrl = "ajax=1&action=refresh";
 
     // Check if it's coming from the Product Controller
     if (settings.url.includes(controllerUrl)) {
@@ -195,5 +196,14 @@ $(document).ajaxComplete(function(event, xhr, settings) {
         // Set Product Name and Product Attribute id
         setProductName(productName);
         setIdProductAttribute(idProductAttribute);
+    }
+
+    // Checks if Cart in Cart Page is empty, do not show Checkout Button
+    if (settings.url.includes(cartRefreshUrl)) {
+        const checkoutButton = document.getElementsByClassName("kupay-buy")[0];
+
+        if (checkoutButton && prestashop.cart.products.length == 0) {
+            checkoutButton.remove();
+        }
     }
 });
