@@ -268,25 +268,6 @@ class KupayCartService
         }
     }
 
-    // private static function getProductImage($id_product)
-    // {
-
-    //     try {
-
-    //         $product = new Product((int)$id_product);
-
-    //         $img = $product->getCover($product->id);
-
-    //         $image_name = $product->link_rewrite[count($product->link_rewrite) - 1];
-
-
-    //         return  Context::getContext()->link->getImageLink($image_name, (int)$img['id_image'], "medium_default");
-    //     } catch (Exception $e) {
-
-    //         return "https://user-images.githubusercontent.com/101482/29592647-40da86ca-875a-11e7-8bc3-941700b0a323.png";
-    //     }
-    // }
-
     public static function calculateCartShipping(Cart $cart): float
     {
 
