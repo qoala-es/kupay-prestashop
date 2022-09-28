@@ -71,6 +71,15 @@ class KupayCartModuleFrontController extends ModuleFrontController
             $url = $_SERVER['REQUEST_URI'];
             $url = parse_url($url);
             parse_str($url['query'], $params);
+
+            // If 'code' parameter was not set in the URL, end with a message and 406 (Not Acceptable) status.
+            if (!$params['code']) {
+                http_response_code(406);
+
+                return $this->ajaxRender(json_encode([
+                    'message' => "Cart ID (code) not defined."
+                ]));
+            }
             $code = $params['code'];
 
             $cart = KupayCartService::retrieve($code, $payload);
