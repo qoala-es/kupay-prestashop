@@ -67,12 +67,22 @@ class KupayCartModuleFrontController extends ModuleFrontController
     protected function processGetRequest() {
 
         try {
-
             $payload = json_decode(Tools::file_get_contents('php://input'), true);
+            $url = $_SERVER['REQUEST_URI'];
+            $url = parse_url($url);
+            parse_str($url['query'], $params);
 
-            $customer = KupayUserService::create($payload['shopper']);
+            // If 'code' parameter was not set in the URL, end with a message and 406 (Not Acceptable) status.
+            if (!$params['code']) {
+                http_response_code(406);
 
-            $cart = KupayCartService::update($customer, $payload);
+                return $this->ajaxRender(json_encode([
+                    'message' => "Cart ID (code) not defined."
+                ]));
+            }
+            $code = $params['code'];
+
+            $cart = KupayCartService::retrieve($code, $payload);
 
             $this->ajaxRender(json_encode($cart));
 

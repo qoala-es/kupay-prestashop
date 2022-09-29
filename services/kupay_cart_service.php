@@ -84,6 +84,16 @@ class KupayCartService
     /**
      * @throws PrestaShopException
      */
+    public static function retrieve($cart, $payload): array
+    {
+        $cart = new Cart($cart);
+
+        return self::buildCartData($cart, $payload);
+    }
+
+    /**
+     * @throws PrestaShopException
+     */
     public static function updateShippingMethod(Cart $cart, $payload): void
     {
         foreach ($payload['shippingMethods'] as $shippingMethod) {
