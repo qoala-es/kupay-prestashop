@@ -84,9 +84,10 @@ class KupayCartService
     /**
      * @throws PrestaShopException
      */
-    public static function retrieve($cart, $payload): array
+    public static function retrieve($cart): array
     {
         $cart = new Cart($cart);
+        $payload = [];
 
         return self::buildCartData($cart, $payload);
     }
@@ -169,15 +170,16 @@ class KupayCartService
      */
     private static function buildCartData(Cart $cart, $payload): array
     {
-
-        $country = new Country(Country::getByIso($payload['shopper']['shippingAddress']['countryCode']));
+        if (isset($payload['shopper'])) {
+            $country = new Country(Country::getByIso($payload['shopper']['shippingAddress']['countryCode']));
+        }
 
         return [
             'code' => (string) $cart->id,
-            'origin' => $payload['origin'],
-            'shopper' => $payload['shopper'],
+            'origin' => isset($payload['origin']) ? $payload['origin'] : NULL,
+            'shopper' => isset($payload['shopper']) ? $payload['shopper'] : NULL,
             'items' => self::getCartProducts($cart),
-            'shippingMethods' => self::getCartShippingMethods($cart, $country),
+            'shippingMethods' => isset($payload['shopper']) ? self::getCartShippingMethods($cart, $country) : NULL,
             'coupons' => self::getCartCoupons($cart),
             'totals' => self::getCartTotals($cart)
         ];

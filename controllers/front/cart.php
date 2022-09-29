@@ -67,7 +67,6 @@ class KupayCartModuleFrontController extends ModuleFrontController
     protected function processGetRequest() {
 
         try {
-            $payload = json_decode(Tools::file_get_contents('php://input'), true);
             $url = $_SERVER['REQUEST_URI'];
             $url = parse_url($url);
             parse_str($url['query'], $params);
@@ -82,7 +81,7 @@ class KupayCartModuleFrontController extends ModuleFrontController
             }
             $code = $params['code'];
 
-            $cart = KupayCartService::retrieve($code, $payload);
+            $cart = KupayCartService::retrieve($code);
 
             $this->ajaxRender(json_encode($cart));
 
