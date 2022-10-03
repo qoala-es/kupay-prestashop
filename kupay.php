@@ -39,7 +39,7 @@ class Kupay extends Module
     {
         $this->name = 'kupay';
         $this->tab = 'front_office_features';
-        $this->version = '1.0.7';
+        $this->version = '1.1.0';
         $this->author = 'Qoala';
         $this->need_instance = 0;
 
