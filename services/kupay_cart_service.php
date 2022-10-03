@@ -49,7 +49,7 @@ class KupayCartService
         $currency_id = Currency::getIdByIsoCode($payload['currency']);
         $lang_id = Language::getIdByIso($payload['shopper']['lang']);
 
-        $cart = new Cart();
+        $cart = new Cart($payload['code'] ? $payload['code'] : null);
         $cart->id_customer = $customer->id;
         $cart->id_lang = $lang_id;
         $cart->id_currency = $currency_id;
@@ -131,17 +131,15 @@ class KupayCartService
     public static function addCoupons(Cart $cart, $payload, $lang_id): void
     {
 
-        if(isset($payload['coupons'])){
+        if (isset($payload['coupons'])) {
 
             foreach ($payload['coupons'] as $coupon) {
 
                 $cartRule = CartRule::getCartsRuleByCode($coupon['code'], $lang_id);
                 $cart->addCartRule((int) $cartRule);
                 $cart->save();
-
             }
         }
-
     }
 
     /**
@@ -233,8 +231,8 @@ class KupayCartService
                 'quantity' => (int) $product['cart_quantity'],
                 'variantId' => (string) $product['id_product_attribute'],
                 'name' => $product['name'] .
-                ((isset($product['attributes']) && $product['attributes'] != null) ?
-                ' (' . $product['attributes'] . ') ' : ''),
+                    ((isset($product['attributes']) && $product['attributes'] != null) ?
+                        ' (' . $product['attributes'] . ') ' : ''),
                 'price' => (float) number_format($product['price'], 2),
                 // 'imageUrl' => self::getProductImage($product['id_product']),
                 'imageUrl' => self::getProductAttributeImage($product['id_product'], $product['id_product_attribute'])
@@ -273,7 +271,6 @@ class KupayCartService
                 $image = $product->getCover($product->id);
                 return Context::getContext()->link->getImageLink($image_name, (int)$image['id_image'], "medium_default");
             }
-
         } catch (Exception $e) {
 
             return "https://user-images.githubusercontent.com/101482/29592647-40da86ca-875a-11e7-8bc3-941700b0a323.png";
