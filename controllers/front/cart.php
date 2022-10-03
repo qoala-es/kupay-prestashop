@@ -1,4 +1,5 @@
 <?php
+
 /**
  * NOTICE OF LICENSE
  *
@@ -39,6 +40,7 @@ if (!defined('_PS_VERSION_')) {
 
 require_once dirname(__FILE__) . '../../../services/kupay_cart_service.php';
 require_once dirname(__FILE__) . '../../../services/kupay_user_service.php';
+require_once dirname(__FILE__) . '../../../services/kupay_authentication_service.php';
 
 class KupayCartModuleFrontController extends ModuleFrontController
 {
@@ -48,6 +50,9 @@ class KupayCartModuleFrontController extends ModuleFrontController
     public function run()
     {
         header('Content-Type: ' . "application/json");
+
+        KupayAuthenticationService::authenticate();
+
         parent::init();
         switch ($_SERVER['REQUEST_METHOD']) {
             case 'GET':
@@ -64,7 +69,8 @@ class KupayCartModuleFrontController extends ModuleFrontController
         }
     }
 
-    protected function processGetRequest() {
+    protected function processGetRequest()
+    {
 
         try {
             $url = $_SERVER['REQUEST_URI'];
@@ -84,22 +90,19 @@ class KupayCartModuleFrontController extends ModuleFrontController
             $cart = KupayCartService::retrieve($code);
 
             $this->ajaxRender(json_encode($cart));
-
-            
         } catch (Exception $e) {
-            
+
             http_response_code(500);
 
             $this->ajaxRender(json_encode([
                 'message' => $e->getMessage(),
                 'trace' => json_encode($e->getTrace())
             ]));
-            
         }
-
     }
 
-    protected function processPostRequest() {
+    protected function processPostRequest()
+    {
 
         try {
 
@@ -110,41 +113,37 @@ class KupayCartModuleFrontController extends ModuleFrontController
             $cart = KupayCartService::create($customer, $payload);
 
             $this->ajaxRender(json_encode($cart));
-            
         } catch (Exception $e) {
-            
+
             http_response_code(500);
 
             $this->ajaxRender(json_encode([
                 'message' => $e->getMessage(),
                 'trace' => json_encode($e->getTrace())
             ]));
-            
         }
     }
 
-    protected function processPutRequest() {
+    protected function processPutRequest()
+    {
 
         try {
 
             $payload = json_decode(Tools::file_get_contents('php://input'), true);
-            
+
             $customer = KupayUserService::update($payload['shopper']);
             $cart = KupayCartService::update($customer, $payload);
 
             $this->ajaxRender(json_encode($cart));
-            
         } catch (Exception $e) {
-            
+
             http_response_code(500);
 
             $this->ajaxRender(json_encode([
                 'message' => $e->getMessage(),
                 'trace' => json_encode($e->getTrace())
             ]));
-            
         }
-
     }
 
 
@@ -156,5 +155,4 @@ class KupayCartModuleFrontController extends ModuleFrontController
             'message' => "Method Not Allowed."
         ]));
     }
-
 }

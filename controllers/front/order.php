@@ -1,4 +1,5 @@
 <?php
+
 /**
  * NOTICE OF LICENSE
  *
@@ -33,12 +34,16 @@
  */
 
 require_once dirname(__FILE__) . '../../../services/kupay_order_service.php';
+require_once dirname(__FILE__) . '../../../services/kupay_authentication_service.php';
 
 class KupayOrderModuleFrontController extends ModuleFrontController
 {
     public function run()
     {
         header('Content-Type: ' . "application/json");
+
+        KupayAuthenticationService::authenticate();
+
         parent::init();
         switch ($_SERVER['REQUEST_METHOD']) {
             case 'POST':
@@ -58,7 +63,6 @@ class KupayOrderModuleFrontController extends ModuleFrontController
             $order = KupayOrderService::create($payload);
 
             $this->ajaxRender(json_encode($order));
-
         } catch (Exception $e) {
 
             http_response_code(500);
@@ -66,7 +70,6 @@ class KupayOrderModuleFrontController extends ModuleFrontController
             $this->ajaxRender(json_encode([
                 'message' => $e->getMessage()
             ]));
-
         }
     }
 
