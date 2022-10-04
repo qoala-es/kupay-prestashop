@@ -49,7 +49,12 @@ class KupayCartService
         $currency_id = Currency::getIdByIsoCode($payload['currency']);
         $lang_id = Language::getIdByIso($payload['shopper']['lang']);
 
-        $cart = new Cart($payload['code'] ? $payload['code'] : null);
+        $cartCode = null;
+        if ($payload['origin'] === 'CART' || $payload['origin'] === 'CHECKOUT') {
+            $cartCode = $payload['code'];
+        }
+        
+        $cart = new Cart($cartCode);
         $cart->id_customer = $customer->id;
         $cart->id_lang = $lang_id;
         $cart->id_currency = $currency_id;
@@ -57,7 +62,12 @@ class KupayCartService
         $cart->id_address_invoice = self::getCustomerDeliveryAddress($customer);
 
         $cart->id_shop = 1;
-        $cart->add();
+        
+        if ($payload['origin'] === 'CART' || $payload['origin'] === 'CHECKOUT') {
+            $cart->update();
+        } else {
+            $cart->add();
+        }
 
         self::addProducts($cart, $payload);
         self::addCoupons($cart, $payload, $lang_id);
@@ -168,16 +178,14 @@ class KupayCartService
      */
     private static function buildCartData(Cart $cart, $payload): array
     {
-        if (isset($payload['shopper'])) {
-            $country = new Country(Country::getByIso($payload['shopper']['shippingAddress']['countryCode']));
-        }
+        $country = new Country(Country::getByIso($payload['shopper']['shippingAddress']['countryCode']));
 
         return [
             'code' => (string) $cart->id,
-            'origin' => isset($payload['origin']) ? $payload['origin'] : NULL,
-            'shopper' => isset($payload['shopper']) ? $payload['shopper'] : NULL,
+            'origin' => $payload['origin'],
+            'shopper' => $payload['shopper'],
             'items' => self::getCartProducts($cart),
-            'shippingMethods' => isset($payload['shopper']) ? self::getCartShippingMethods($cart, $country) : NULL,
+            'shippingMethods' => self::getCartShippingMethods($cart, $country),
             'coupons' => self::getCartCoupons($cart),
             'totals' => self::getCartTotals($cart)
         ];
