@@ -34,6 +34,8 @@ use PrestaShopBundle\Entity\Lang;
  * @license   GPLv2 or later
  * @license-file license.txt
  */
+
+require_once dirname(__FILE__) . '../../services/kupay_log_service.php';
 class KupayCartService
 {
 
@@ -69,6 +71,9 @@ class KupayCartService
             $cart->add();
         }
 
+        $logger = new KupayLogService();
+        $logger::logNewRelic("INFO", "Cart (ID: $cart->id) Create", "cart");
+
         self::addProducts($cart, $payload);
         self::addCoupons($cart, $payload, $lang_id);
 
@@ -84,6 +89,9 @@ class KupayCartService
         $lang_id = Language::getIdByIso($payload['shopper']['lang']);
 
         $cart = new Cart($payload['code']);
+
+        $logger = new KupayLogService();
+        $logger::logNewRelic("INFO", "Cart (ID: $cart->id) Update", "cart");
 
         self::addCoupons($cart, $payload, $lang_id);
         self::updateShippingMethod($cart, $payload);
@@ -179,6 +187,9 @@ class KupayCartService
     private static function buildCartData(Cart $cart, $payload): array
     {
         $country = new Country(Country::getByIso($payload['shopper']['shippingAddress']['countryCode']));
+
+        $logger = new KupayLogService();
+        $logger::logNewRelic("INFO", "Build Cart Data (ID: $cart->id)", "cart");
 
         return [
             'code' => (string) $cart->id,

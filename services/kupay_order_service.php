@@ -82,7 +82,8 @@ class KupayOrderService
 
         $order->add();
 
-
+        $logger = new KupayLogService();
+        $logger::logNewRelic("INFO", "Order (ID: $order->id) create", "order");
 
         self::addProducts($order, $cart);
 
