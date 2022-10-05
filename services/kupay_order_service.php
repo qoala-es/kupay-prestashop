@@ -55,7 +55,7 @@ class KupayOrderService
         $order->id_currency = (int)  $cart->id_currency;
         $order->id_carrier = $cart->id_carrier;
         $order->id_lang = (int) $cart->id_lang;
-        $order->payment = "Kupay";
+        $order->payment = "Qoala";
         $order->module = $paymentName;
         $order->total_paid = (float) $cart->getOrderTotal();
         $order->total_paid_real = (float) $cart->getOrderTotal();
@@ -73,7 +73,7 @@ class KupayOrderService
         $order->id_shop = $cart->id_shop;
         $order->conversion_rate = 1;
         $order->secure_key = $cart->secure_key;
-        $order->note = "Placed via Kupay 1-Click Checkout";
+        $order->note = "Placed via Qoala 1-Click Checkout";
         $order->reference = Order::generateReference();
         $order->current_state = Configuration::get('PS_OS_OUTOFSTOCK_UNPAID');
         $order->date_add = date('Y-m-d H:i:s');

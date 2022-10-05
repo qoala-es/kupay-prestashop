@@ -49,7 +49,12 @@ class KupayCartService
         $currency_id = Currency::getIdByIsoCode($payload['currency']);
         $lang_id = Language::getIdByIso($payload['shopper']['lang']);
 
-        $cart = new Cart();
+        $cartCode = null;
+        if ($payload['origin'] === 'CART' || $payload['origin'] === 'CHECKOUT') {
+            $cartCode = $payload['code'];
+        }
+        
+        $cart = new Cart($cartCode);
         $cart->id_customer = $customer->id;
         $cart->id_lang = $lang_id;
         $cart->id_currency = $currency_id;
@@ -57,7 +62,12 @@ class KupayCartService
         $cart->id_address_invoice = self::getCustomerDeliveryAddress($customer);
 
         $cart->id_shop = 1;
-        $cart->add();
+        
+        if ($payload['origin'] === 'CART' || $payload['origin'] === 'CHECKOUT') {
+            $cart->update();
+        } else {
+            $cart->add();
+        }
 
         self::addProducts($cart, $payload);
         self::addCoupons($cart, $payload, $lang_id);
@@ -131,17 +141,15 @@ class KupayCartService
     public static function addCoupons(Cart $cart, $payload, $lang_id): void
     {
 
-        if(isset($payload['coupons'])){
+        if (isset($payload['coupons'])) {
 
             foreach ($payload['coupons'] as $coupon) {
 
                 $cartRule = CartRule::getCartsRuleByCode($coupon['code'], $lang_id);
                 $cart->addCartRule((int) $cartRule);
                 $cart->save();
-
             }
         }
-
     }
 
     /**
@@ -170,16 +178,14 @@ class KupayCartService
      */
     private static function buildCartData(Cart $cart, $payload): array
     {
-        if (isset($payload['shopper'])) {
-            $country = new Country(Country::getByIso($payload['shopper']['shippingAddress']['countryCode']));
-        }
+        $country = new Country(Country::getByIso($payload['shopper']['shippingAddress']['countryCode']));
 
         return [
             'code' => (string) $cart->id,
-            'origin' => isset($payload['origin']) ? $payload['origin'] : NULL,
-            'shopper' => isset($payload['shopper']) ? $payload['shopper'] : NULL,
+            'origin' => $payload['origin'],
+            'shopper' => $payload['shopper'],
             'items' => self::getCartProducts($cart),
-            'shippingMethods' => isset($payload['shopper']) ? self::getCartShippingMethods($cart, $country) : NULL,
+            'shippingMethods' => self::getCartShippingMethods($cart, $country),
             'coupons' => self::getCartCoupons($cart),
             'totals' => self::getCartTotals($cart)
         ];
@@ -233,8 +239,8 @@ class KupayCartService
                 'quantity' => (int) $product['cart_quantity'],
                 'variantId' => (string) $product['id_product_attribute'],
                 'name' => $product['name'] .
-                ((isset($product['attributes']) && $product['attributes'] != null) ?
-                ' (' . $product['attributes'] . ') ' : ''),
+                    ((isset($product['attributes']) && $product['attributes'] != null) ?
+                        ' (' . $product['attributes'] . ') ' : ''),
                 'price' => (float) number_format($product['price'], 2),
                 // 'imageUrl' => self::getProductImage($product['id_product']),
                 'imageUrl' => self::getProductAttributeImage($product['id_product'], $product['id_product_attribute'])
@@ -273,7 +279,6 @@ class KupayCartService
                 $image = $product->getCover($product->id);
                 return Context::getContext()->link->getImageLink($image_name, (int)$image['id_image'], "medium_default");
             }
-
         } catch (Exception $e) {
 
             return "https://user-images.githubusercontent.com/101482/29592647-40da86ca-875a-11e7-8bc3-941700b0a323.png";
