@@ -39,7 +39,7 @@ class Kupay extends Module
     {
         $this->name = 'kupay';
         $this->tab = 'front_office_features';
-        $this->version = '1.1.0';
+        $this->version = '1.1.1';
         $this->author = 'Qoala';
         $this->need_instance = 0;
 
@@ -167,26 +167,26 @@ class Kupay extends Module
                             )
                         )
                     ],
-                    // [
-                    //     'type' => 'switch',
-                    //     'label' => $this->l('Enable checkout button on Cart Page'),
-                    //     'name' => 'KUPAYMODULE_CART',
-                    //     'size' => 20,
-                    //     'required' => true,
-                    //     'is_bool' => true,
-                    //     'values' => array(
-                    //         array(
-                    //             'id' => 'ON',
-                    //             'value' => true,
-                    //             'label' => $this->l('Enabled')
-                    //         ),
-                    //         array(
-                    //             'id' => 'OFF',
-                    //             'value' => false,
-                    //             'label' => $this->l('Disabled')
-                    //         )
-                    //     )
-                    // ],
+                    [
+                        'type' => 'switch',
+                        'label' => $this->l('Enable checkout button on Cart Page'),
+                        'name' => 'KUPAYMODULE_CART',
+                        'size' => 20,
+                        'required' => true,
+                        'is_bool' => true,
+                        'values' => array(
+                            array(
+                                'id' => 'ON',
+                                'value' => true,
+                                'label' => $this->l('Enabled')
+                            ),
+                            array(
+                                'id' => 'OFF',
+                                'value' => false,
+                                'label' => $this->l('Disabled')
+                            )
+                        )
+                    ],
                     [
                         'type' => 'switch',
                         'label' => $this->l('Enable checkout button on Checkout Page'),
