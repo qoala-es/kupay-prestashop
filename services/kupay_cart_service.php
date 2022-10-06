@@ -55,7 +55,7 @@ class KupayCartService
         if ($payload['origin'] === 'CART' || $payload['origin'] === 'CHECKOUT') {
             $cartCode = $payload['code'];
         }
-        
+
         $cart = new Cart($cartCode);
         $cart->id_customer = $customer->id;
         $cart->id_lang = $lang_id;
@@ -64,20 +64,21 @@ class KupayCartService
         $cart->id_address_invoice = self::getCustomerDeliveryAddress($customer);
 
         $cart->id_shop = 1;
-        
+
         if ($payload['origin'] === 'CART' || $payload['origin'] === 'CHECKOUT') {
             $cart->update();
         } else {
             $cart->add();
         }
 
-        $logger = new KupayLogService();
-        $logger::logNewRelic("INFO", "Cart (ID: $cart->id) Create", "cart");
-
         self::addProducts($cart, $payload);
         self::addCoupons($cart, $payload, $lang_id);
 
-        return self::buildCartData($cart, $payload);
+        $cartData = self::buildCartData($cart, $payload);
+
+        KupayLogService::logNewRelic("INFO", "Cart (ID: $cart->id) Create", $cartData, "cart");
+
+        return $cartData;
     }
 
     /**
@@ -90,13 +91,14 @@ class KupayCartService
 
         $cart = new Cart($payload['code']);
 
-        $logger = new KupayLogService();
-        $logger::logNewRelic("INFO", "Cart (ID: $cart->id) Update", "cart");
-
         self::addCoupons($cart, $payload, $lang_id);
         self::updateShippingMethod($cart, $payload);
 
-        return self::updateCartData($cart, $payload);
+        $cartData = self::updateCartData($cart, $payload);
+
+        KupayLogService::logNewRelic("INFO", "Cart (ID: $cart->id) Create", $cartData, "cart");
+
+        return $cartData;
     }
 
     /**
@@ -187,9 +189,6 @@ class KupayCartService
     private static function buildCartData(Cart $cart, $payload): array
     {
         $country = new Country(Country::getByIso($payload['shopper']['shippingAddress']['countryCode']));
-
-        $logger = new KupayLogService();
-        $logger::logNewRelic("INFO", "Build Cart Data (ID: $cart->id)", "cart");
 
         return [
             'code' => (string) $cart->id,

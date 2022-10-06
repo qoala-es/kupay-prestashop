@@ -33,12 +33,17 @@
  * @license-file license.txt
  */
 
+require_once dirname(__FILE__) . '../../services/kupay_log_service.php';
+
 class KupayAuthenticationService
 {
 
     public static function authenticate()
     {
         if (!isset(getallheaders()["Authorization"]) || getallheaders()["Authorization"] !== Configuration::get('KUPAYMODULE_APIKEY')) {
+
+            KupayLogService::logNewRelic("ERROR", "Authentication error. API-Key: " . getallheaders()["Authorization"], null, "authentication");
+
             http_response_code(403);
             exit;
         }

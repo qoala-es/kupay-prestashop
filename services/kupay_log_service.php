@@ -1,4 +1,5 @@
 <?php
+
 /**
  * NOTICE OF LICENSE
  *
@@ -35,7 +36,8 @@
 class KupayLogService
 {
 
-    public static function logNewRelic($type, $msg, $service, $trace = '', $env = 'PROD') {
+    public static function logNewRelic($type, $msg, $data, $service, $trace = '', $env = 'PROD')
+    {
 
         $apiKey = 'eu01xx6b5da31d9438593b25a43a0097FFFFNRAL';
 
@@ -45,33 +47,32 @@ class KupayLogService
 
         $curl = curl_init();
         curl_setopt_array($curl, array(
-        CURLOPT_URL => 'https://log-api.eu.newrelic.com/log/v1',
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => '',
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 0,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => 'POST',
-        CURLOPT_POSTFIELDS =>'{
-            "message": "'.$msg.'",
-            "logtype": "'.$type.'",
+            CURLOPT_URL => 'https://log-api.eu.newrelic.com/log/v1',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS => '{
+            "message": "' . $msg . '",
+            "data": "' . json_encode($data) . '",
+            "logtype": "' . $type . '",
             "platform": "prestashop",
-            "service": "'.$service.'",
-            "hostname": "'.$_SERVER['SERVER_NAME'].'",
-            "trace": "'.$trace.'",
-            "version": "'.$version.'",
-            "environment": "'.$env.'"
+            "service": "' . $service . '",
+            "hostname": "' . $_SERVER['SERVER_NAME'] . '",
+            "trace": "' . $trace . '",
+            "version": "' . $version . '",
+            "environment": "' . $env . '",
         }',
-        CURLOPT_HTTPHEADER => array(
-            "Api-Key: $apiKey",
-            "Content-Type: application/json"
-        ),
+            CURLOPT_HTTPHEADER => array(
+                "Api-Key: $apiKey",
+                "Content-Type: application/json"
+            ),
         ));
 
-        $response = curl_exec($curl);
+        curl_exec($curl);
         curl_close($curl);
-
     }
-
 }
