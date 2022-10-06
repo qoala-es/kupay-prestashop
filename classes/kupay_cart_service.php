@@ -65,7 +65,7 @@ class KupayCartService
             $cart->id_address_invoice = self::getCustomerDeliveryAddress($customer);
 
             $cart->id_shop = 1;
-            throw new Exception("This is a test Exception");
+
             if ($payload['origin'] === 'CART' || $payload['origin'] === 'CHECKOUT') {
                 $cart->update();
             } else {
