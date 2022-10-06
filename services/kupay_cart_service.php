@@ -42,76 +42,63 @@ class KupayCartService
     /**
      * @throws PrestaShopDatabaseException
      * @throws PrestaShopException
-     * @throws Exception
      */
     public static function create(Customer $customer, $payload): array
     {
 
-        try {
+        // $shops = Shop::getShops();
 
-            $currency_id = Currency::getIdByIsoCode($payload['currency']);
-            $lang_id = Language::getIdByIso($payload['shopper']['lang']);
+        $currency_id = Currency::getIdByIsoCode($payload['currency']);
+        $lang_id = Language::getIdByIso($payload['shopper']['lang']);
 
-            $cartCode = null;
-            if ($payload['origin'] === 'CART' || $payload['origin'] === 'CHECKOUT') {
-                $cartCode = $payload['code'];
-            }
-
-            $cart = new Cart($cartCode);
-            $cart->id_customer = $customer->id;
-            $cart->id_lang = $lang_id;
-            $cart->id_currency = $currency_id;
-            $cart->id_address_delivery = self::getCustomerDeliveryAddress($customer);
-            $cart->id_address_invoice = self::getCustomerDeliveryAddress($customer);
-
-            $cart->id_shop = 1;
-
-            if ($payload['origin'] === 'CART' || $payload['origin'] === 'CHECKOUT') {
-                $cart->update();
-            } else {
-                $cart->add();
-            }
-
-            self::addProducts($cart, $payload);
-            self::addCoupons($cart, $payload, $lang_id);
-
-            $cartData = self::buildCartData($cart, $payload);
-    
-            KupayLogService::logNewRelic("INFO", "Cart (ID: $cart->id) Create", "cart");
-    
-            return $cartData;
-            
-        } catch (Exception $e) {
-            KupayLogService::logNewRelic("ERROR", "Cart (ID: $cart->id) Create Error | ". $e->getMessage(), "cart", $e->getTraceAsString());
+        $cartCode = null;
+        if ($payload['origin'] === 'CART' || $payload['origin'] === 'CHECKOUT') {
+            $cartCode = $payload['code'];
         }
 
+        $cart = new Cart($cartCode);
+        $cart->id_customer = $customer->id;
+        $cart->id_lang = $lang_id;
+        $cart->id_currency = $currency_id;
+        $cart->id_address_delivery = self::getCustomerDeliveryAddress($customer);
+        $cart->id_address_invoice = self::getCustomerDeliveryAddress($customer);
+
+        $cart->id_shop = 1;
+
+        if ($payload['origin'] === 'CART' || $payload['origin'] === 'CHECKOUT') {
+            $cart->update();
+        } else {
+            $cart->add();
+        }
+
+        self::addProducts($cart, $payload);
+        self::addCoupons($cart, $payload, $lang_id);
+
+        $cartData = self::buildCartData($cart, $payload);
+
+        KupayLogService::logNewRelic("INFO", "Cart (ID: $cart->id) Create", "cart");
+
+        return $cartData;
     }
 
     /**
      * @throws PrestaShopException
-     * @throws Exception
      */
     public static function update(Customer $customer, $payload): array
     {
-        try {
 
-            $lang_id = Language::getIdByIso($payload['shopper']['lang']);
+        $lang_id = Language::getIdByIso($payload['shopper']['lang']);
 
-            $cart = new Cart($payload['code']);
+        $cart = new Cart($payload['code']);
 
-            self::addCoupons($cart, $payload, $lang_id);
-            self::updateShippingMethod($cart, $payload);
+        self::addCoupons($cart, $payload, $lang_id);
+        self::updateShippingMethod($cart, $payload);
 
-            $cartData = self::updateCartData($cart, $payload);
+        $cartData = self::updateCartData($cart, $payload);
 
-            KupayLogService::logNewRelic("INFO", "Cart (ID: $cart->id) Update", "cart");
-            
-            return $cartData;
+        KupayLogService::logNewRelic("INFO", "Cart (ID: $cart->id) Update", "cart");
 
-        } catch (Exception $e) {
-            KupayLogService::logNewRelic("ERROR", "Cart (ID: $cart->id) Update Error | ". $e->getMessage(), "cart", $e->getTraceAsString());
-        }
-
+        return $cartData;
     }
 
     /**

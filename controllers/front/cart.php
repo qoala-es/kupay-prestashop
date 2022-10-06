@@ -83,9 +83,9 @@ class KupayCartModuleFrontController extends ModuleFrontController
             $this->ajaxRender(json_encode($cart));
         } catch (Exception $e) {
 
-            http_response_code(500);
-
             KupayLogService::logNewRelic("ERROR", "Post Request Error | " . $e->getMessage(), "cart", $e->getTraceAsString());
+
+            http_response_code(500);
 
             $this->ajaxRender(json_encode([
                 'message' => $e->getMessage(),
@@ -107,9 +107,9 @@ class KupayCartModuleFrontController extends ModuleFrontController
             $this->ajaxRender(json_encode($cart));
         } catch (Exception $e) {
 
-            http_response_code(500);
-
             KupayLogService::logNewRelic("ERROR", "Put Request Error | " . $e->getMessage(), "cart", $e->getTraceAsString());
+
+            http_response_code(500);
 
             $this->ajaxRender(json_encode([
                 'message' => $e->getMessage(),

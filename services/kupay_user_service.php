@@ -38,71 +38,55 @@ require_once dirname(__FILE__) . '../../services/kupay_log_service.php';
 class KupayUserService
 {
 
-    /**
-     * @throws Exception
-     */
-    public static function create($shopper) {
 
-        try {
-            $customer = new Customer();
-    
-            $existing_customers = Customer::getCustomersByEmail($shopper['email']);
-    
-            if(!empty($existing_customers)){
-                return self::update($shopper);
-            }
-    
-            $name = explode(" ", $shopper['name']);
-            $customer->firstname = $name[0];
-            $customer->lastname = $name[1];
-            $customer->email = $shopper['email'];
-            $customer->active = 1;
-            $customer->is_guest = 0;
-            $customer->passwd = uniqid();
-    
-            $customer->add();
+    public static function create($shopper){
         
-            KupayAddressService::create($shopper, $customer);
-    
-            KupayLogService::logNewRelic("INFO", "Shopper (ID: $customer->id) Create", "user");
+        $customer = new Customer();
 
-            return $customer;
-            
-        } catch (Exception $e) {
-            KupayLogService::logNewRelic("ERROR", "Shopper (ID: $customer->id) Create Error | ". $e->getMessage(), "user", $e->getTraceAsString());
+        $existing_customers = Customer::getCustomersByEmail($shopper['email']);
+
+        if(!empty($existing_customers)){
+            return self::update($shopper);
         }
+
+        $name = explode(" ", $shopper['name']);
+        $customer->firstname = $name[0];
+        $customer->lastname = $name[1];
+        $customer->email = $shopper['email'];
+        $customer->active = 1;
+        $customer->is_guest = 0;
+        $customer->passwd = uniqid();
+
+        $customer->add();
+    
+        KupayAddressService::create($shopper, $customer);
+
+        KupayLogService::logNewRelic("INFO", "User (ID: $customer->id) Create", "user");
+
+        return $customer;
 
     }
 
-    /**
-     * @throws Exception
-     */
     public static function update($shopper){
 
-        try {
-            $customer = self::getExistingCustomer($shopper);
-    
-            $name = explode(" ", $shopper['name']);
-    
-            $customer->firstname = $name[0];
-            $customer->lastname = $name[1];
-            $customer->email = $shopper['email'];
-            $customer->active = 1;
-            $customer->is_guest = 0;
-            $customer->passwd = uniqid();
-    
-            $customer->update();
-            
-            KupayAddressService::update($shopper, $customer);
+        $customer = self::getExistingCustomer($shopper);
 
-            KupayLogService::logNewRelic("INFO", "Shopper (ID: $customer->id) Update", "user");
-    
-            return $customer;
-            
-        } catch (Exception $e) {
-            KupayLogService::logNewRelic("ERROR", "Shopper (ID: $customer->id) Update Error | ". $e->getMessage(), "user", $e->getTraceAsString());
-        }
+        $name = explode(" ", $shopper['name']);
 
+        $customer->firstname = $name[0];
+        $customer->lastname = $name[1];
+        $customer->email = $shopper['email'];
+        $customer->active = 1;
+        $customer->is_guest = 0;
+        $customer->passwd = uniqid();
+
+        $customer->update();
+        
+        KupayAddressService::update($shopper, $customer);
+
+        KupayLogService::logNewRelic("INFO", "User (ID: $customer->id) Update", "user");
+
+        return $customer;
 
     }
 

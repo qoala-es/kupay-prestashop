@@ -67,9 +67,9 @@ class KupayOrderModuleFrontController extends ModuleFrontController
             $this->ajaxRender(json_encode($order));
         } catch (Exception $e) {
 
-            http_response_code(500);
-
             KupayLogService::logNewRelic("ERROR", "Post Request Error | " . $e->getMessage(), "order", $e->getTraceAsString());
+
+            http_response_code(500);
 
             $this->ajaxRender(json_encode([
                 'message' => $e->getMessage()

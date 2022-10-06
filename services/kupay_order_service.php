@@ -38,67 +38,57 @@ require_once dirname(__FILE__) . './../services/kupay_cart_service.php';
 class KupayOrderService
 {
 
-    /**
-     * @throws Exception
-     */
     public static function create($payload)
     {
-        try {
 
-            $paymentMethods = PaymentModuleCore::getInstalledPaymentModules();
-            $paymentModule = Module::getInstanceByName($paymentMethods[0]['name']);
-            $paymentName = $paymentModule->name;
+        $paymentMethods = PaymentModuleCore::getInstalledPaymentModules();
+        $paymentModule = Module::getInstanceByName($paymentMethods[0]['name']);
+        $paymentName = $paymentModule->name;
 
-            $cart = new Cart($payload['cartId']);
+        $cart = new Cart($payload['cartId']);
 
-            $order = new Order();
-            $order->id_customer = $cart->id_customer;
-            $order->id_address_delivery = $cart->id_address_delivery;
-            $order->id_address_invoice = $cart->id_address_delivery;
-            $order->id_cart = $cart->id;
-            $order->id_currency = (int)  $cart->id_currency;
-            $order->id_carrier = $cart->id_carrier;
-            $order->id_lang = (int) $cart->id_lang;
-            $order->payment = "Qoala";
-            $order->module = $paymentName;
-            $order->total_paid = (float) $cart->getOrderTotal();
-            $order->total_paid_real = (float) $cart->getOrderTotal();
-            $order->total_products = (float) number_format(KupayCartService::calculateProductsTotal($cart), 2);
-            $order->total_products_wt = (float) number_format(KupayCartService::calculateProductsTotal($cart), 2);
-            $order->total_discounts = 0;
-            $order->total_discounts_tax_incl = 0;
-            $order->total_discounts_tax_excl = 0;
-            $order->total_paid_tax_incl = (float) number_format($cart->getOrderTotal(), 2);
-            $order->total_paid_tax_excl = (float) number_format($cart->getOrderTotal(false), 2);
-            $order->total_shipping = (float) number_format($cart->getTotalShippingCost(), 2);
-            $order->total_discounts = (float) number_format($cart->getDiscountSubtotalWithoutGifts(true), 2);
-            $order->total_shipping_tax_incl = (float) number_format($cart->getTotalShippingCost(), 2);
-            $order->total_shipping_tax_excl = (float) number_format($cart->getTotalShippingCost(), 2);
-            $order->id_shop = $cart->id_shop;
-            $order->conversion_rate = 1;
-            $order->secure_key = $cart->secure_key;
-            $order->note = "Placed via Qoala 1-Click Checkout";
-            $order->reference = Order::generateReference();
-            $order->current_state = Configuration::get('PS_OS_OUTOFSTOCK_UNPAID');
-            $order->date_add = date('Y-m-d H:i:s');
-            $order->date_upd = date('Y-m-d H:i:s');
-            $order->current_state = 3;
+        $order = new Order();
+        $order->id_customer = $cart->id_customer;
+        $order->id_address_delivery = $cart->id_address_delivery;
+        $order->id_address_invoice = $cart->id_address_delivery;
+        $order->id_cart = $cart->id;
+        $order->id_currency = (int)  $cart->id_currency;
+        $order->id_carrier = $cart->id_carrier;
+        $order->id_lang = (int) $cart->id_lang;
+        $order->payment = "Qoala";
+        $order->module = $paymentName;
+        $order->total_paid = (float) $cart->getOrderTotal();
+        $order->total_paid_real = (float) $cart->getOrderTotal();
+        $order->total_products = (float) number_format(KupayCartService::calculateProductsTotal($cart), 2);
+        $order->total_products_wt = (float) number_format(KupayCartService::calculateProductsTotal($cart), 2);
+        $order->total_discounts = 0;
+        $order->total_discounts_tax_incl = 0;
+        $order->total_discounts_tax_excl = 0;
+        $order->total_paid_tax_incl = (float) number_format($cart->getOrderTotal(), 2);
+        $order->total_paid_tax_excl = (float) number_format($cart->getOrderTotal(false), 2);
+        $order->total_shipping = (float) number_format($cart->getTotalShippingCost(), 2);
+        $order->total_discounts = (float) number_format($cart->getDiscountSubtotalWithoutGifts(true), 2);
+        $order->total_shipping_tax_incl = (float) number_format($cart->getTotalShippingCost(), 2);
+        $order->total_shipping_tax_excl = (float) number_format($cart->getTotalShippingCost(), 2);
+        $order->id_shop = $cart->id_shop;
+        $order->conversion_rate = 1;
+        $order->secure_key = $cart->secure_key;
+        $order->note = "Placed via Qoala 1-Click Checkout";
+        $order->reference = Order::generateReference();
+        $order->current_state = Configuration::get('PS_OS_OUTOFSTOCK_UNPAID');
+        $order->date_add = date('Y-m-d H:i:s');
+        $order->date_upd = date('Y-m-d H:i:s');
+        $order->current_state = 3;
 
-            $order->add();
-
-            self::addProducts($order, $cart);
-
-            self::createOrderPaymentTransaction($order);
-
-            $orderData = self::buildOrderData($order);
-
-            KupayLogService::logNewRelic("INFO", "Order (ID: $order->id) Create", "order");
-
-            return $orderData;
-
-        } catch (Exception $e) {
-            KupayLogService::logNewRelic("ERROR", "Order (ID: $cart->id) Create Error | " . $e->getMessage(), "order", $e->getTraceAsString());
-        }
+        $order->add();
+        
+        self::addProducts($order, $cart);
+        
+        self::createOrderPaymentTransaction($order);
+        
+        KupayLogService::logNewRelic("INFO", "Order (ID: $order->id) create", "order");
+        
+        return self::buildOrderData($order);
     }
 
     public static function addCoupons(Order $order, Cart $cart)
