@@ -33,6 +33,7 @@
  */
 
 require_once dirname(__FILE__) . '../../services/kupay_address_service.php';
+require_once dirname(__FILE__) . '../../services/kupay_log_service.php';
 
 class KupayUserService
 {
@@ -60,6 +61,8 @@ class KupayUserService
     
         KupayAddressService::create($shopper, $customer);
 
+        KupayLogService::logNewRelic("INFO", "User (ID: $customer->id) Create", "user");
+
         return $customer;
 
     }
@@ -80,6 +83,8 @@ class KupayUserService
         $customer->update();
         
         KupayAddressService::update($shopper, $customer);
+
+        KupayLogService::logNewRelic("INFO", "User (ID: $customer->id) Update", "user");
 
         return $customer;
 

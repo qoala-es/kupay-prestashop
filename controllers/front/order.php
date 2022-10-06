@@ -35,6 +35,7 @@
 
 require_once dirname(__FILE__) . '../../../services/kupay_order_service.php';
 require_once dirname(__FILE__) . '../../../services/kupay_authentication_service.php';
+require_once dirname(__FILE__) . '../../../services/kupay_log_service.php';
 
 class KupayOrderModuleFrontController extends ModuleFrontController
 {
@@ -42,7 +43,8 @@ class KupayOrderModuleFrontController extends ModuleFrontController
     {
         header('Content-Type: ' . "application/json");
 
-        KupayAuthenticationService::authenticate();
+        $payload = json_decode(Tools::file_get_contents('php://input'), true);
+        KupayAuthenticationService::authenticate($payload);
 
         parent::init();
         switch ($_SERVER['REQUEST_METHOD']) {
@@ -64,6 +66,8 @@ class KupayOrderModuleFrontController extends ModuleFrontController
 
             $this->ajaxRender(json_encode($order));
         } catch (Exception $e) {
+
+            KupayLogService::logNewRelic("ERROR", "Post Request Error | " . $e->getMessage(), "order", $e->getTraceAsString());
 
             http_response_code(500);
 

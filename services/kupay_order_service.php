@@ -81,13 +81,13 @@ class KupayOrderService
         $order->current_state = 3;
 
         $order->add();
-
-
-
+        
         self::addProducts($order, $cart);
-
+        
         self::createOrderPaymentTransaction($order);
-
+        
+        KupayLogService::logNewRelic("INFO", "Order (ID: $order->id) create", "order");
+        
         return self::buildOrderData($order);
     }
 
