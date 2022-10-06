@@ -35,6 +35,7 @@
 
 require_once dirname(__FILE__) . '../../../services/kupay_order_service.php';
 require_once dirname(__FILE__) . '../../../services/kupay_authentication_service.php';
+require_once dirname(__FILE__) . '../../../services/kupay_log_service.php';
 
 class KupayOrderModuleFrontController extends ModuleFrontController
 {
@@ -67,6 +68,8 @@ class KupayOrderModuleFrontController extends ModuleFrontController
         } catch (Exception $e) {
 
             http_response_code(500);
+
+            KupayLogService::logNewRelic("ERROR", "Post Request Error | " . $e->getMessage(), "order", $e->getTraceAsString());
 
             $this->ajaxRender(json_encode([
                 'message' => $e->getMessage()

@@ -41,6 +41,7 @@ if (!defined('_PS_VERSION_')) {
 require_once dirname(__FILE__) . '../../../services/kupay_cart_service.php';
 require_once dirname(__FILE__) . '../../../services/kupay_user_service.php';
 require_once dirname(__FILE__) . '../../../services/kupay_authentication_service.php';
+require_once dirname(__FILE__) . '../../../services/kupay_log_service.php';
 
 class KupayCartModuleFrontController extends ModuleFrontController
 {
@@ -84,6 +85,8 @@ class KupayCartModuleFrontController extends ModuleFrontController
 
             http_response_code(500);
 
+            KupayLogService::logNewRelic("ERROR", "Post Request Error | " . $e->getMessage(), "cart", $e->getTraceAsString());
+
             $this->ajaxRender(json_encode([
                 'message' => $e->getMessage(),
                 'trace' => json_encode($e->getTrace())
@@ -105,6 +108,8 @@ class KupayCartModuleFrontController extends ModuleFrontController
         } catch (Exception $e) {
 
             http_response_code(500);
+
+            KupayLogService::logNewRelic("ERROR", "Put Request Error | " . $e->getMessage(), "cart", $e->getTraceAsString());
 
             $this->ajaxRender(json_encode([
                 'message' => $e->getMessage(),
