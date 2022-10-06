@@ -38,11 +38,16 @@ require_once dirname(__FILE__) . '../../services/kupay_log_service.php';
 class KupayAuthenticationService
 {
 
-    public static function authenticate()
+    public static function authenticate($payload)
     {
-        if (!isset(getallheaders()["Authorization"]) || getallheaders()["Authorization"] !== Configuration::get('KUPAYMODULE_APIKEY')) {
 
-            KupayLogService::logNewRelic("ERROR", "Authentication error. API-Key: " . getallheaders()["Authorization"], null, "authentication");
+        $apiKey = $payload['apiKey'];
+
+        KupayLogService::logNewRelic("INFO", "Authentication attempt: " . $apiKey, "authentication");
+
+        if (!$apiKey || $apiKey !== Configuration::get('KUPAYMODULE_APIKEY')) {
+
+            KupayLogService::logNewRelic("ERROR", "Authentication error: " . $apiKey, "authentication");
 
             http_response_code(403);
             exit;

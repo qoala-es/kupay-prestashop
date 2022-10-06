@@ -76,7 +76,7 @@ class KupayCartService
 
         $cartData = self::buildCartData($cart, $payload);
 
-        KupayLogService::logNewRelic("INFO", "Cart (ID: $cart->id) Create", $cartData, "cart");
+        KupayLogService::logNewRelic("INFO", "Cart create", "cart");
 
         return $cartData;
     }
@@ -96,20 +96,9 @@ class KupayCartService
 
         $cartData = self::updateCartData($cart, $payload);
 
-        KupayLogService::logNewRelic("ERROR", "Cart (ID: $cart->id) Create", $cartData, "cart");
+        KupayLogService::logNewRelic("INFO", "Cart update", "cart");
 
         return $cartData;
-    }
-
-    /**
-     * @throws PrestaShopException
-     */
-    public static function retrieve($cart): array
-    {
-        $cart = new Cart($cart);
-        $payload = [];
-
-        return self::buildCartData($cart, $payload);
     }
 
     /**

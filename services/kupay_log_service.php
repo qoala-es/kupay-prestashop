@@ -36,7 +36,7 @@
 class KupayLogService
 {
 
-    public static function logNewRelic($type, $msg, $data, $service, $trace = '', $env = 'PROD')
+    public static function logNewRelic($type, $msg, $service, $trace = '', $env = 'PROD')
     {
 
         $apiKey = 'eu01xx6b5da31d9438593b25a43a0097FFFFNRAL';
@@ -51,13 +51,12 @@ class KupayLogService
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_MAXREDIRS => 10,
-            CURLOPT_TIMEOUT => 0,
+            CURLOPT_TIMEOUT => 120,
             CURLOPT_FOLLOWLOCATION => true,
             CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'POST',
             CURLOPT_POSTFIELDS => '{
             "message": "' . $msg . '",
-            "data": "' . json_encode($data) . '",
             "logtype": "' . $type . '",
             "platform": "prestashop",
             "service": "' . $service . '",
@@ -65,6 +64,7 @@ class KupayLogService
             "trace": "' . $trace . '",
             "version": "' . $version . '",
             "environment": "' . $env . '",
+            "timestamp":  "' . time() . '"
         }',
             CURLOPT_HTTPHEADER => array(
                 "Api-Key: $apiKey",
@@ -73,6 +73,7 @@ class KupayLogService
         ));
 
         curl_exec($curl);
+
         curl_close($curl);
     }
 }

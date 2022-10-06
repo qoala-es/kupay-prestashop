@@ -51,13 +51,12 @@ class KupayCartModuleFrontController extends ModuleFrontController
     {
         header('Content-Type: ' . "application/json");
 
-        KupayAuthenticationService::authenticate();
+        $payload = json_decode(Tools::file_get_contents('php://input'), true);
+        KupayAuthenticationService::authenticate($payload);
 
         parent::init();
+
         switch ($_SERVER['REQUEST_METHOD']) {
-            case 'GET':
-                $this->processGetRequest();
-                break;
             case 'POST':
                 $this->processPostRequest();
                 break;
@@ -66,38 +65,6 @@ class KupayCartModuleFrontController extends ModuleFrontController
                 break;
             default:
                 $this->processNotSupportedRequest();
-        }
-    }
-
-    protected function processGetRequest()
-    {
-
-        try {
-            $url = $_SERVER['REQUEST_URI'];
-            $url = parse_url($url);
-            parse_str($url['query'], $params);
-
-            // If 'code' parameter was not set in the URL, end with a message and 406 (Not Acceptable) status.
-            if (!$params['code']) {
-                http_response_code(406);
-
-                return $this->ajaxRender(json_encode([
-                    'message' => "Cart ID (code) not defined."
-                ]));
-            }
-            $code = $params['code'];
-
-            $cart = KupayCartService::retrieve($code);
-
-            $this->ajaxRender(json_encode($cart));
-        } catch (Exception $e) {
-
-            http_response_code(500);
-
-            $this->ajaxRender(json_encode([
-                'message' => $e->getMessage(),
-                'trace' => json_encode($e->getTrace())
-            ]));
         }
     }
 

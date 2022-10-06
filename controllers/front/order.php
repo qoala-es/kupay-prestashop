@@ -42,7 +42,8 @@ class KupayOrderModuleFrontController extends ModuleFrontController
     {
         header('Content-Type: ' . "application/json");
 
-        KupayAuthenticationService::authenticate();
+        $payload = json_decode(Tools::file_get_contents('php://input'), true);
+        KupayAuthenticationService::authenticate($payload);
 
         parent::init();
         switch ($_SERVER['REQUEST_METHOD']) {
