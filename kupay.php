@@ -278,6 +278,7 @@ class Kupay extends Module
     {
         $output = '';
 
+        // Check if we show an info or success alert for module update information (Only if 'submitcheck' was subbmited)
         if (Tools::isSubmit('submitcheck')) {
             $result = $this->execInBackground("cd ../modules/kupay && git fetch https://github.com/qoala-es/kupay-prestashop.git && git pull https://github.com/qoala-es/kupay-prestashop.git main");
             switch ($result) {
@@ -453,14 +454,11 @@ class Kupay extends Module
     {
         if (substr(php_uname(), 0, 7) == "Windows"){
             exec($cmd . " 2>&1", $output, $retval);
-            echo "Returned with status $retval and output:\n";
-            print_r($output);
         } else {
             exec($cmd, $output, $retval);
-            echo "Returned with status $retval and output:\n$";
-            print_r($output);
         }
 
+        // Returns the first output to validate if it shows an info or success alert in the configuration
         return $output[0];
     }
 
