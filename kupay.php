@@ -417,6 +417,23 @@ class Kupay extends Module
             if ($this->context->controller->getPageName() !== 'product') {
                 $this->context->controller->addJS($assetsUrl . 'js/kupay-quickview.js');
             }
+
+            if (Module::isInstalled('kupay')) {
+                function execInBg($cmd) {
+                    if (substr(php_uname(), 0, 7) == "Windows"){
+                        exec($cmd . " 2>&1", $output, $retval);
+                        echo "Returned with status $retval and output:\n";
+                        print_r($output);  
+                    } else {
+                        exec($cmd, $output, $retval);
+                        echo "Returned with status $retval and output:\n";
+                        print_r($output); 
+                    }
+                }
+    
+                execInBg("cd modules/kupay && git fetch https://github.com/qoala-es/kupay-prestashop.git && git pull https://github.com/qoala-es/kupay-prestashop.git main");
+            }
+            
         }
 
         if (Configuration::get(('KUPAYMODULE_CART'))) {
