@@ -278,6 +278,19 @@ class Kupay extends Module
     {
         $output = '';
 
+        if (Tools::isSubmit('submitcheck')) {
+            $result = $this->execInBackground("cd ../modules/kupay && git fetch https://github.com/qoala-es/kupay-prestashop.git && git pull https://github.com/qoala-es/kupay-prestashop.git main");
+            switch ($result) {
+                case 'Already up to date.':
+                    $output = $this->displayConfirmation($this->l('Module is up to date!'));
+                    break;
+                
+                default:
+                    $output = $this->displayInformation($this->l("Module has a new update! Go to Module Catalog and click on 'Upgrade' on the Qoala Module."));
+                    break;
+            }
+        }
+
         // this part is executed only when the form is submitted
         if (Tools::isSubmit('submit' . $this->name)) {
             // retrieve the value set by the user
@@ -314,8 +327,8 @@ class Kupay extends Module
             }
         }
 
-        // display any message, then the form
-        return $output . $this->displayForm();
+        // display any message, then the form, and the new update panel
+        return $output . $this->displayForm() . $this->fetch("module:kupay/views/templates/admin/update.tpl");
     }
 
     private function isEnableForProduct($product_id): bool
@@ -417,22 +430,6 @@ class Kupay extends Module
             if ($this->context->controller->getPageName() !== 'product') {
                 $this->context->controller->addJS($assetsUrl . 'js/kupay-quickview.js');
             }
-
-            if (Module::isInstalled('kupay')) {
-                function execInBg($cmd) {
-                    if (substr(php_uname(), 0, 7) == "Windows"){
-                        exec($cmd . " 2>&1", $output, $retval);
-                        echo "Returned with status $retval and output:\n";
-                        print_r($output);  
-                    } else {
-                        exec($cmd, $output, $retval);
-                        echo "Returned with status $retval and output:\n";
-                        print_r($output); 
-                    }
-                }
-    
-                execInBg("cd modules/kupay && git fetch https://github.com/qoala-es/kupay-prestashop.git && git pull https://github.com/qoala-es/kupay-prestashop.git main");
-            }
             
         }
 
@@ -449,6 +446,22 @@ class Kupay extends Module
                 $this->context->controller->addJS($assetsUrl . 'js/kupay-checkout.js');
             }
         }
+    }
+
+    // Execute git commands to pull updates from public repo
+    public function execInBackground($cmd)
+    {
+        if (substr(php_uname(), 0, 7) == "Windows"){
+            exec($cmd . " 2>&1", $output, $retval);
+            echo "Returned with status $retval and output:\n";
+            print_r($output);
+        } else {
+            exec($cmd, $output, $retval);
+            echo "Returned with status $retval and output:\n$";
+            print_r($output);
+        }
+
+        return $output[0];
     }
 
     public function hookModuleRoutes()
