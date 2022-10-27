@@ -30,6 +30,7 @@ if (!defined('_PS_VERSION_')) {
 }
 
 require_once dirname(__FILE__) . '/services/kupay_routes_service.php';
+require_once dirname(__FILE__) . '/services/kupay_update_service.php';
 
 class Kupay extends Module
 {
@@ -280,12 +281,17 @@ class Kupay extends Module
 
         // Check if we show an info or success alert for module update information (Only if 'submitcheck' was subbmited)
         if (Tools::isSubmit('submitcheck')) {
-            $result = $this->execInBackground("cd ../modules/kupay && git fetch https://github.com/qoala-es/kupay-prestashop.git && git pull https://github.com/qoala-es/kupay-prestashop.git main");
+            $result = KupayUpdateService::executeCmdInBackground("cd ../modules/kupay && git fetch https://github.com/qoala-es/kupay-prestashop.git && git pull https://github.com/qoala-es/kupay-prestashop.git main");
+            
             switch ($result) {
                 case 'Already up to date.':
                     $output = $this->displayConfirmation($this->l('Module is up to date!'));
                     break;
                 
+                case 'Error':
+                    $output = $this->displayError($this->l('There was en error when trying to update the module.'));
+                    break;
+
                 default:
                     $output = $this->displayInformation($this->l("Module has a new update! Go to Module Catalog and click on 'Upgrade' on the Qoala Module."));
                     break;
@@ -447,19 +453,6 @@ class Kupay extends Module
                 $this->context->controller->addJS($assetsUrl . 'js/kupay-checkout.js');
             }
         }
-    }
-
-    // Execute git commands to pull updates from public repo
-    public function execInBackground($cmd)
-    {
-        if (substr(php_uname(), 0, 7) == "Windows"){
-            exec($cmd . " 2>&1", $output, $retval);
-        } else {
-            exec($cmd, $output, $retval);
-        }
-
-        // Returns the first output to validate if it shows an info or success alert in the configuration
-        return $output[0];
     }
 
     public function hookModuleRoutes()
