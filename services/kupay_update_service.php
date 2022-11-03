@@ -50,7 +50,7 @@ class KupayUpdateService
                 exec($cmd, $output, $retval);
             }
 
-            KupayLogService::logNewRelic("INFO", "Execution of command in bg (on $os): " . $cmd, "update");
+            KupayLogService::logNewRelic("INFO", "Execution of command in bg (on $os): " . $cmd . " | Output: " . $output[0], "update");
 
         } catch (Exception $e) {
 
