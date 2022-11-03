@@ -292,6 +292,10 @@ class Kupay extends Module
                     $output = $this->displayError($this->l('There was en error when trying to update the module.'));
                     break;
 
+                case '':
+                    $output = $this->displayWarning($this->l('The update process could not be completed. Please contact the Qoala support.'));
+                    break;
+
                 default:
                     $output = $this->displayInformation($this->l("Module has a new update! Go to Module Catalog and click on 'Upgrade' on the Qoala Module."));
                     break;

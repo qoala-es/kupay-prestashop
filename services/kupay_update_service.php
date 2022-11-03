@@ -49,8 +49,18 @@ class KupayUpdateService
                 $os = 'Linux/Unix';
                 exec($cmd, $output, $retval);
             }
+            
+            $outputString = "";
 
-            KupayLogService::logNewRelic("INFO", "Execution of command in bg (on $os): " . $cmd . " | Output: " . $output[0], "update");
+            if (count($output) > 1) {
+                foreach ($output as $value) {
+                    $outputString .= $value . " - ";
+                }
+            } else {
+                $outputString = $output[0];
+            }
+
+            KupayLogService::logNewRelic("INFO", "Execution of command in bg (on $os): " . $cmd . " | Output: " . $outputString, "update");
 
         } catch (Exception $e) {
 
