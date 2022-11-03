@@ -2,7 +2,7 @@
 <module>
     <name>kupay</name>
     <displayName><![CDATA[Kupay]]></displayName>
-    <version><![CDATA[1.0.4]]></version>
+    <version><![CDATA[1.2.1]]></version>
     <description><![CDATA[Kupay 1-Click Checkout]]></description>
     <author><![CDATA[Kupay]]></author>
     <tab><![CDATA[front_office_features]]></tab>
