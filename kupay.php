@@ -30,7 +30,6 @@ if (!defined('_PS_VERSION_')) {
 }
 
 require_once dirname(__FILE__) . '/services/kupay_routes_service.php';
-require_once dirname(__FILE__) . '/services/kupay_update_service.php';
 
 class Kupay extends Module
 {
@@ -279,29 +278,6 @@ class Kupay extends Module
     {
         $output = '';
 
-        // Check if we show an info or success alert for module update information (Only if 'submitcheck' was subbmited)
-        if (Tools::isSubmit('submitcheck')) {
-            $result = KupayUpdateService::executeCmdInBackground("cd ../modules/kupay && git fetch https://github.com/qoala-es/kupay-prestashop.git && git pull https://github.com/qoala-es/kupay-prestashop.git main");
-            
-            switch ($result) {
-                case 'Already up to date.':
-                    $output = $this->displayConfirmation($this->l('Module is up to date!'));
-                    break;
-                
-                case 'Error':
-                    $output = $this->displayError($this->l('There was en error when trying to update the module.'));
-                    break;
-
-                case '':
-                    $output = $this->displayWarning($this->l('The update process could not be completed. Please contact the Qoala support.'));
-                    break;
-
-                default:
-                    $output = $this->displayInformation($this->l("Module has a new update! Go to Module Catalog and click on 'Upgrade' on the Qoala Module."));
-                    break;
-            }
-        }
-
         // this part is executed only when the form is submitted
         if (Tools::isSubmit('submit' . $this->name)) {
             // retrieve the value set by the user
@@ -338,8 +314,8 @@ class Kupay extends Module
             }
         }
 
-        // display any message, then the form, and the new update panel
-        return $output . $this->displayForm() . $this->fetch("module:kupay/views/templates/admin/update.tpl");
+        // display any message, then the form
+        return $output . $this->displayForm();
     }
 
     private function isEnableForProduct($product_id): bool
