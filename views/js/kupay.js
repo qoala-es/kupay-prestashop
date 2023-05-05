@@ -153,7 +153,9 @@ async function kupayPdpQuickviewCheckout() {
 
     // Get Product price
     let price = document.getElementsByClassName('current-price-value')[0];
-    price = parseFloat(price.innerHTML.trim().substring(1));
+    price = price.innerHTML.trim().slice(0, -7);
+    price = parseFloat(price.replace('.', '').replace(/,/g, '.'));
+    console.log('price:', price);
 
     let iframeUrl = kupay.iframeUrl;
 
